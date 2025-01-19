@@ -34,7 +34,6 @@
         ### initialization code ...
         
         while(level <= maxLevel):
-            paths.setEntities()
             # Relation Exploration
             relationCandidates = searcher.relationSearch(paths)
             topNRelations = llm.relationPrune(question, relationCandidates)
@@ -56,15 +55,13 @@
 ### 2. Paths
 ```python
  class Paths:
-    self.paths
-    # set first element of triple(entity, relation, entity)
-    # only takes parameter when it starts(receive topic entities)
-    def setEntities(entities: list[list[str]] = None) -> None:
+    self.paths: list[list[str]]
 
     def getEntities() -> list[str]:
     def getRelations() -> list[str]:
-    def appendEntities(newEntities: list[list[str]]) -> None:
-    def appendRelations(newRelations: list[list[str]]) -> None:
+    def getTriplePaths() -> list[list[tuple(str, str, str)]]:
+    def appendEntities(newEntityLists: list[list[str]]) -> None:
+    def appendRelations(newRelationLists: list[list[str]]) -> None:
 ```
 
 ### 3. Searcher
@@ -86,8 +83,8 @@ class Llm:
 
 ## MileStone
 
-0. 개발환경 세팅
-1. Paths class 구현 및 테스트
+0. ~~개발환경 세팅~~
+1. ~~Paths class 구현 및 테스트~~
 2. Searcher class 구현 및 테스트
 3. Llm class 구현 및 테스트
 4. ToG 구현 및 테스트(1개 질문)
