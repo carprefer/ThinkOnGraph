@@ -14,7 +14,7 @@
 
 [KG] Freebase
 
-- 아쉽게도 Tesla P40이 vllm을 지원하지 않는다. 
+- 아쉽게도 Tesla P40이 vllm을 지원하지 않는다.
 - 서버에 CUDA SDK 12.2 버전은 PyTorch에서 지원하지 않는다.
 
 ---
@@ -67,17 +67,17 @@
 ### 3. Searcher
 ```python
  class Searcher:
-    def entitySearch(paths: list[list[list[str]]]) -> list[list[str]]:
-    def relationSearch(paths: list[list[list[str]]]) -> list[list[str]]:
+    def entitySearch(paths: Paths) -> list[list[str]]:
+    def relationSearch(paths: Paths) -> list[list[str]]:
 ```
 
 ### 4. Llm
 ```python
 class Llm:
-    def entityPrune(question: str, entityCandidates: list[list[str]]) -> list[list[str]]:
-    def relationPrune(question: str, relationCandidates: list[list[str]]) -> list[list[str]]:
-    def isEnoughToAnswer(question: str, paths: list[list[list[str]]]) -> bool:
-    def generateAnswer(question: str, paths: list[list[list[str]]] = None) -> str:
+    def entityPrune(question: str, relations: list[str], entityCandidates: list[list[str]]) -> list[list[str]]:
+    def relationPrune(question: str, entities: list[str], relationCandidates: list[list[str]]) -> list[list[str]]:
+    def isEnoughToAnswer(question: str, triplePaths: list[list[tuple]]) -> bool:
+    def generateAnswer(question: str, triplePaths: list[list[tuple]] = None) -> str:
 ```
 - prone함수의 경우, LLM을 N번 사용하는 방법과 1번만 사용하는 방법을 둘 다 시도해볼 것
 
@@ -94,7 +94,7 @@ class Llm:
 
 ## Initial Setting
 
-### Miniconda3 설치
+#### Miniconda3 설치
 ```shell
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
@@ -115,7 +115,7 @@ source ~/.bashrc
 conda activate ToG
 ```
 
-### CUDA Toolkit 설치
+#### CUDA Toolkit 설치
 ```shell
 wget https://developer.download.nvidia.com/compute/cuda/12.4.1/local_installers/cuda_12.4.1_550.54.15_linux.run
 
@@ -128,7 +128,56 @@ export LD_LIBRARY_PATH=~/cuda-12.4/lib64${LD_LIBRARY_PATH+:${LD_LIBRARY_PATH}}
 source ~/.bashrc
 ```
 
-### PyTorch 설치
+#### PyTorch 설치
 ```shell
 conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvidia
+```
+
+## KG Construction
+
+#### Freebase data 다운로드
+```shell
+cd /mnt/sde/shcha
+wget https://commondatastorage.googleapis.com/freebase-public/rdf/freebase-rdf-latest.gz
+```
+
+#### Preprocessing
+```shell
+gunzip -c freebase-rdf-latest.gz > freebase # data size: 400G
+# after copy filterEnglishTriplets.py on /mnt/sde/shcha
+nohup python -u filterEnglishTriplets.py 0<freebase 1>FilterFreebase 2>log_err & # data size: 125G
+```
+
+#### Virtuoso 다운로드
+```shell
+cd /mnt/sde/shcha
+wget https://sourceforge.net/projects/virtuoso/files/virtuoso/7.2.5/virtuoso-opensource.x86_64-generic_glibc25-linux-gnu.tar.gz
+```
+
+#### Database 생성
+```shell
+tar xvpfz virtuoso-opensource.x86_64-generic_glibc25-linux-gnu.tar.gz
+cd virtuoso-opensource/database/
+mv virtuoso.ini.sample virtuoso.ini
+
+# ../bin/virtuoso-t -df # start the service in the shell
+../bin/virtuoso-t  # start the service in the backend.
+../bin/isql 1111 dba dba # run the database
+
+# 1、unzip the data and use rdf_loader to import
+SQL>
+ld_dir('.', 'FilterFreebase', 'http://freebase.com'); 
+rdf_loader_run(); 
+```
+
+#### SPARQLWrapper 설치
+```shell
+conda install -c conda-forge sparqlwrapper
+```
+
+## LLM Construction
+
+#### Transformers 설치
+```shell
+conda install -c conda-forge transformers
 ```

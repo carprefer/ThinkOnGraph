@@ -1,4 +1,5 @@
 from paths import Paths
+from searcher import Searcher
 
 def pathsTest():
     # after topic extraction
@@ -21,10 +22,26 @@ def pathsTest():
     paths.appendEntities(top3Entities2)
     assert(paths.getEntities() == ['vegetarian', 'human acts', 'south korea'])
     
-    for path in paths.getTriplePaths():
-        print(path)
+    paths.print()
 
     print("pass pathsTest")
 
+def searcherTest():
+    searcher = Searcher()
+    topicEntities = ['canberra']
+    paths = Paths(topicEntities)
+    # relation exploration
+    relationLists = searcher.relationSearch(paths)
+    top3Relations = [relationList[0] for relationList in relationLists]
+    paths.appendRelations(top3Relations)
+    # entity exploration
+    entityLists = searcher.relationSearch(paths)
+    top3Entities = [entityList[0] for entityList in entityLists]
+    paths.appendEntities(top3Entities)
+
+    paths.print()
+    
+    print("pass searcherTest")
 
 pathsTest()
+searcherTest()

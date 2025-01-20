@@ -10,9 +10,8 @@ class Paths:
 
     def getEntities(self) -> list[str]:
         assert len(self.paths) > 0 and len(self.paths) <= self.width
-        assert all(len(path) % 2 == 1 for path in self.paths)
 
-        return [path[-1] for path in self.paths]
+        return [path[-1] if len(path) % 2 == 1 else path[-2] for path in self.paths]
 
     def getRelations(self) -> list[str]:
         assert len(self.paths) > 0 and len(self.paths) <= self.width
@@ -55,3 +54,10 @@ class Paths:
             newPaths += [self.paths[i] + [relation] for relation in newRelationLists[i]]
 
         self.paths = newPaths
+
+    def length(self):
+        return len(self.paths)
+
+    def print(self):
+        for path in self.getTriplePaths():
+            print(path)
