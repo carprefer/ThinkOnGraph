@@ -19,7 +19,7 @@ class Paths:
 
         return [path[-1] for path in self.paths]
 
-    def getTriplePaths(self) -> list[list[tuple]]:
+    def getTriplePaths(self) -> list[list[tuple[str, str, str]]]:
         assert len(self.paths) > 0 and len(self.paths) <= self.width
         assert all(len(path) % 2 == 1 and len(path) >= 3 for path in self.paths)
 
@@ -59,5 +59,5 @@ class Paths:
         return len(self.paths)
 
     def print(self):
-        for path in self.getTriplePaths():
+        for path in self.paths:
             print(path)

@@ -1,7 +1,10 @@
 from paths import Paths
 from searcher import Searcher
+from llm import Llm
+from toG import ToG
 
 def pathsTest():
+    print("< start >")
     # after topic extraction
     topicEntities = ['book', 'country']
     paths = Paths(topicEntities)
@@ -21,10 +24,11 @@ def pathsTest():
     top3Entities2 = [['vegetarian', 'human acts'], [], ['south korea']]
     paths.appendEntities(top3Entities2)
     assert(paths.getEntities() == ['vegetarian', 'human acts', 'south korea'])
-    
+
+    print("< final paths >")
     paths.print()
 
-    print("pass pathsTest")
+    print("< pass pathsTest >")
 
 def searcherTest():
     searcher = Searcher()
@@ -41,7 +45,51 @@ def searcherTest():
 
     paths.print()
     
-    print("pass searcherTest")
+    print("< pass searcherTest >")
+
+def llmTest():
+    llm = Llm()
+    question = "what is the capital of South Korea?"
+    topicEntities = ['South Korea']
+    paths = Paths(topicEntities)
+    print("< start >")
+    print("Q: ", question)
+    print("topics: ", topicEntities)
+    paths.print()
+    # relation exploration
+    relationCandidates = [['locate at', 'population', 'territorial size', 'neighbor of', 'capital of']]
+    top3Relations = llm.relationPrune(question, paths, relationCandidates)
+    paths.appendRelations(top3Relations)
+    print("< after relation exploration >")
+    paths.print()
+    # entity exploration
+    entityCandidates = [['Seoul'], ['Asia', 'East Asia', 'Earth'], ['Japan', 'China', 'Russia']]
+    top3Entities = llm.entityPrune(question, paths, entityCandidates)
+    paths.appendEntities(top3Entities)
+    print("< after entity exploration >")
+    paths.print()
+    
+    if llm.isEnoughToAnswer(question, paths):
+        print("There are enough informations")
+    else:
+        print("Need more informations")
+    
+    print("< answer >")
+    print(llm.generateAnswer(question, paths))
+    paths.print()
+
+    print("< pass llmTest >")
+
+def toGTest():
+    toG = ToG()
+    question = "what is the capital of South Korea?"
+    topicEntities = ['South Korea']
+    answer = toG.inference(question, topicEntities)
+    print("answer: " + answer)
+
+    print("pass toGTest")
 
 pathsTest()
-searcherTest()
+# searcherTest()
+llmTest()
+toGTest()

@@ -30,25 +30,25 @@
 ### 1. ToG
 ```python
  class ToG:
-    def inference(question: str) -> str:
+    def inference(question: str, topicEntities: list[str] = None) -> tuple[str, Paths]:
         ### initialization code ...
         
-        while(level <= maxLevel):
+        while(depth <= maxDepth):
             # Relation Exploration
             relationCandidates = searcher.relationSearch(paths)
-            topNRelations = llm.relationPrune(question, relationCandidates)
+            topNRelations = llm.relationPrune(question, paths, relationCandidates)
             paths.appendRelations(topNRelations)
             # Entity Exploration
             entityCandidates = searcher.entitySearch(paths)
-            topNEntities = llm.entityPrune(question, entityCandidates)
+            topNEntities = llm.entityPrune(question, paths, entityCandidates)
             paths.appendEntities(topNEntities)
             # Reasoning 
             if llm.isEnoughToAnswer(question, paths):
-                return llm.generateAnswer(question, paths)
+                return llm.generateAnswer(question, paths.getTriplePaths())
             else:
-                level += 1
+                depth += 1
 
-        return llm.generateAnswer(question)
+        return llm.generateAnswer(question, paths.getTriplePaths())
 ```
 - main의 반복문 내에서 질문을 받을 때마다 ToG.inference(question)을 수행한다. 
 
@@ -59,7 +59,7 @@
 
     def getEntities() -> list[str]:
     def getRelations() -> list[str]:
-    def getTriplePaths() -> list[list[tuple(str, str, str)]]:
+    def getTriplePaths() -> list[list[tuple[str, str, str]]]:
     def appendEntities(newEntityLists: list[list[str]]) -> None:
     def appendRelations(newRelationLists: list[list[str]]) -> None:
 ```
@@ -74,10 +74,10 @@
 ### 4. Llm
 ```python
 class Llm:
-    def entityPrune(question: str, relations: list[str], entityCandidates: list[list[str]]) -> list[list[str]]:
-    def relationPrune(question: str, entities: list[str], relationCandidates: list[list[str]]) -> list[list[str]]:
-    def isEnoughToAnswer(question: str, triplePaths: list[list[tuple]]) -> bool:
-    def generateAnswer(question: str, triplePaths: list[list[tuple]] = None) -> str:
+    def entityPrune(question: str, paths: Paths, entityCandidates: list[list[str]]) -> list[list[str]]:
+    def relationPrune(question: str, paths: Paths, relationCandidates: list[list[str]]) -> list[list[str]]:
+    def isEnoughToAnswer(question: str, paths: Paths) -> bool:
+    def generateAnswer(question: str, paths: Paths) -> str:
 ```
 - prone함수의 경우, LLM을 N번 사용하는 방법과 1번만 사용하는 방법을 둘 다 시도해볼 것
 
@@ -160,14 +160,13 @@ tar xvpfz virtuoso-opensource.x86_64-generic_glibc25-linux-gnu.tar.gz
 cd virtuoso-opensource/database/
 mv virtuoso.ini.sample virtuoso.ini
 
+mv /mnt/sde/shcha/FilterFreebase .
+
 # ../bin/virtuoso-t -df # start the service in the shell
 ../bin/virtuoso-t  # start the service in the backend.
-../bin/isql 1111 dba dba # run the database
 
-# 1、unzip the data and use rdf_loader to import
-SQL>
-ld_dir('.', 'FilterFreebase', 'http://freebase.com'); 
-rdf_loader_run(); 
+../bin/isql 1111 dba dba exec="ld_dir('.', 'FilterFreebase', 'http://freebase.com');"
+nohup ../bin/isql 1111 dba dba exec="rdf_loader_run();" &
 ```
 
 #### SPARQLWrapper 설치
@@ -177,7 +176,23 @@ conda install -c conda-forge sparqlwrapper
 
 ## LLM Construction
 
+#### Huggingface 설정
+1. huggingface 가입
+2. Meta's Llama2 models의 access permission 얻기
+3. access token을 만들고, inference 체크 및 repositories permission에 meta-llama/Llama-2-70b-chat-hf 추가
+```shell
+conda install -c huggingface huggingface_hub
+huggingface-cli login
+
+# add next lines in ~/.bashrc
+export HUGGINGFACE_HUB_TOKEN="your huggingface token"
+export HF_HOME=/mnt/sde/shcha/cache    # to locate caches on large disk
+
+source ~/.bashrc
+```
+
 #### Transformers 설치
 ```shell
 conda install -c conda-forge transformers
+conda install accelerate
 ```
