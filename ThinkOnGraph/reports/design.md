@@ -30,7 +30,7 @@
 ### 1. ToG
 ```python
  class ToG:
-    def inference(question: str, topicEntities: list[str] = None) -> tuple[str, Paths]:
+    def inference(question: str, topicIdEntities: list[tuple[str, str]] = None) -> tuple[str, Paths]:
         ### initialization code ...
         
         while(depth <= maxDepth):
@@ -40,8 +40,8 @@
             paths.appendRelations(topNRelations)
             # Entity Exploration
             entityCandidates = searcher.entitySearch(paths)
-            topNEntities = llm.entityPrune(question, paths, entityCandidates)
-            paths.appendEntities(topNEntities)
+            topNIdEntities = llm.entityPrune(question, paths, entityCandidates)
+            paths.appendEntities(topNIdEntities)
             # Reasoning 
             if llm.isEnoughToAnswer(question, paths):
                 return llm.generateAnswer(question, paths.getTriplePaths())
@@ -55,12 +55,12 @@
 ### 2. Paths
 ```python
  class Paths:
-    self.paths: list[list[str]]
+    self.paths: list[list[tuple[str, str], str]]
 
     def getEntities() -> list[str]:
     def getRelations() -> list[str]:
     def getTriplePaths() -> list[list[tuple[str, str, str]]]:
-    def appendEntities(newEntityLists: list[list[str]]) -> None:
+    def appendEntities(self, newIdEntityLists: list[list[tuple[str, str]]]) -> None:
     def appendRelations(newRelationLists: list[list[str]]) -> None:
 ```
 
@@ -74,7 +74,7 @@
 ### 4. Llm
 ```python
 class Llm:
-    def entityPrune(question: str, paths: Paths, entityCandidates: list[list[str]]) -> list[list[str]]:
+    def entityPrune(self, question: str, paths: Paths, idEntityCandidates: list[list[tuple[str, str]]]) -> list[list[tuple[str, str]]]:
     def relationPrune(question: str, paths: Paths, relationCandidates: list[list[str]]) -> list[list[str]]:
     def isEnoughToAnswer(question: str, paths: Paths) -> bool:
     def generateAnswer(question: str, paths: Paths) -> str:
@@ -139,6 +139,8 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvi
 ```shell
 cd /mnt/sde/shcha
 wget https://commondatastorage.googleapis.com/freebase-public/rdf/freebase-rdf-latest.gz
+
+wget https://storage.googleapis.com/freebase-public/fb2w.nt.gz
 ```
 
 #### Preprocessing
@@ -146,6 +148,8 @@ wget https://commondatastorage.googleapis.com/freebase-public/rdf/freebase-rdf-l
 gunzip -c freebase-rdf-latest.gz > freebase # data size: 400G
 # after copy filterEnglishTriplets.py on /mnt/sde/shcha
 nohup python -u filterEnglishTriplets.py 0<freebase 1>FilterFreebase 2>log_err & # data size: 125G
+
+gunzip -c fb2w.nt.gz > fb2w
 ```
 
 #### Virtuoso 다운로드

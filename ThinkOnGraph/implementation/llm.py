@@ -1,6 +1,7 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from maker import promptMaker
+from parser import parser 
 from paths import Paths
 
 assert torch.cuda.device_count() == 8
@@ -17,11 +18,8 @@ class Llama:
             device_map='auto',
             torch_dtype=torch.float16
         )
-        #self.model.parallelize()
-        # self.model = torch.nn.DataParallel(model)
-        # self.model.to(self.device)
 
-    def answer(self, prompt: str, temperature) -> str:
+    def answer(self, prompt: str, temperature: float) -> str:
         assert temperature >= 0 and temperature <= 1
         assert len(prompt) >= 10
         messages = [
@@ -32,50 +30,47 @@ class Llama:
             model=self.model, 
             tokenizer=self.tokenizer,
             device_map="auto", 
-            temperature=temperature)
+            temperature=temperature,
+            do_sample=False,
+            max_length=12000,
+            )
         outputs = generator(messages)
-        return outputs[0]['generated_text']
-        #print("enter answer func")
-
-        #inputTokens = self.tokenizer(prompt, return_tensors='pt').to(self.device)
-        #print("after toGPU")
-        #with torch.no_grad():
-        #    print("no_grad")
-        #    print("prompt: ", prompt)
-        #    print(inputTokens)
-        #    outputs = self.model.module.generate(inputTokens, temperature=temperature)
-        #print("get outputs")
-        #return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-
+        return outputs[0]['generated_text'][1]['content']
 
 class Llm:
     def __init__(self):
         self.llama = Llama()
 
-    def entityPrune(self, question: str, paths: Paths, entityCandidates: list[list[str]]) -> list[list[str]]:
+    # entity could be different after prune
+    def entityPrune(self, question: str, paths: Paths, idEntityCandidates: list[list[tuple[str, str]]]) -> list[list[tuple[str, str]]]:
         relations: list[str] = paths.getRelations()
         width = paths.width
+        id2entityDict = {}
+        for idEntityCandidate in idEntityCandidates:
+            id2entityDict.update(dict(idEntityCandidate))
+
+        entity2idDict = {value: key for key, value in id2entityDict.items()}
 
         assert len(question) >= 5
-        assert len(relations) == len(entityCandidates)
-        assert len(relations) <= sum([len(entities) for entities in entityCandidates])
+        assert len(relations) == len(idEntityCandidates)
+        #assert len(relations) <= sum([len(entities) for entities in idEntityCandidates])
 
         entityCandidatesWithScore: list[tuple] = []
         for i in range(len(relations)):
-            assert len(entityCandidatesWithScore) == i
-
-            prompt = promptMaker.entityPrune(question, relations[i], entityCandidates[i])
+            entityCandidates = map(lambda x: x[1], idEntityCandidates[i])
+            prompt = promptMaker.entityPrune(question, relations[i], entityCandidates, 3)
             answer = self.llama.answer(prompt, 0.4)
+
             # TODO adjust parsing methods
-            entityCandidatesWithScore += [tuple(entityScore.split(':')) + (i,) for entityScore in answer.split(';')]
+            entityCandidatesWithScore += parser.afterEntityPrune(answer, i, 3)
 
-        entitiesWithScore = entityCandidatesWithScore.sorted(key=lambda x: x[1])[:width]
-        entities = [[] for _ in range(width)]
+        entitiesWithScore = sorted(entityCandidatesWithScore, key=lambda x: x[1], reverse=True)[:width]
+        idEntities = [[] for _ in relations]    # it's length can be different with 'width'
         for (entity, score, index) in entitiesWithScore:
-            entities[index] += entity
+            id = entity2idDict[entity] if entity in entity2idDict else 'None'
+            idEntities[index].append((id, entity))
 
-        return entities
+        return idEntities
     
     # make list of (relation, score, index) tuple for each entity
     # and select top N relations according to their scores
@@ -85,25 +80,21 @@ class Llm:
         width: int = paths.width
         assert len(question) >= 5
         assert len(entities) == len(relationCandidates)
-        assert len(entities) <= sum([len(relations) for relations in relationCandidates])
+        #assert len(entities) <= sum([len(relations) for relations in relationCandidates])
 
         relationCandidatesWithScore: list[tuple] = []
         for i in range(len(entities)):
-            assert len(relationCandidatesWithScore) == i
-
             # TODO adjust k(3)
             prompt = promptMaker.relationPrune(question, entities[i], relationCandidates[i], 3)
-            print("make prompt")
             answer = self.llama.answer(prompt, 0.4)
-            print("get answer")
-            print(answer)
-            # TODO adjust parsing methods
-            relationCandidatesWithScore += [tuple(relationScore.split(':')) + (i,) for relationScore in answer.split(';')]
 
-        relationsWithScore = relationCandidatesWithScore.sorted(key=lambda x: x[1])[:width]
-        relations = [[] for _ in range(width)]
+            # TODO adjust parsing methods
+            relationCandidatesWithScore += parser.afterRelationPrune(answer, i)
+
+        relationsWithScore = sorted(relationCandidatesWithScore, key=lambda x: x[1], reverse=True)[:width]
+        relations = [[] for _ in entities]    # it's length can be different with 'width'
         for (relation, score, index) in relationsWithScore:
-            relations[index] += relation
+            relations[index].append(relation)
 
         return relations
     
@@ -113,7 +104,7 @@ class Llm:
         assert all(len(triple) == 3 for path in triplePaths for triple in path)
 
         prompt = promptMaker.reasoning(question, triplePaths)
-        answer = self.llama.answer(prompt, 0)
+        answer = self.llama.answer(prompt, 0.0)
         assert 'Yes' in answer or 'No' in answer
 
         return 'Yes' in answer
@@ -124,5 +115,5 @@ class Llm:
         assert all(len(triple) == 3 for path in triplePaths for triple in path)
 
         prompt = promptMaker.generate(question, triplePaths)
-        return self.llama.answer(prompt, 0)
+        return self.llama.answer(prompt, 0.0)
     

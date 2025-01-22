@@ -4,69 +4,68 @@ from llm import Llm
 from toG import ToG
 
 def pathsTest():
-    print("< start >")
+    print("<<<<< pathsTest start >>>>>")
     # after topic extraction
-    topicEntities = ['book', 'country']
-    paths = Paths(topicEntities)
+    topicIdEntities = [('m0', 'book'), ('m1', 'country')]
+    paths = Paths(topicIdEntities)
     # after relation exploration
-    top3Relations1 = [['written by', 'length'], ['locate at']]
+    top3Relations1 = [['written_by', 'length'], ['locate_at']]
     paths.appendRelations(top3Relations1)
-    assert(paths.getRelations() == ['written by', 'length', 'locate at'])
+    assert(paths.getRelations() == ['written_by', 'length', 'locate_at'])
     # after entity exploration
-    top3Entities1 = [['sunho', 'han gang'], [], ['asia']]
-    paths.appendEntities(top3Entities1)
-    assert(paths.getEntities() == ['sunho', 'han gang', 'asia'])
+    top3IdEntities1 = [[('m2', 'sunho'), ('m3', 'han_gang')], [], [('m4', 'asia')]]
+    paths.appendEntities(top3IdEntities1)
+    assert(paths.getEntities() == ['sunho', 'han_gang', 'asia'])
     # after relation exploration
     top3Relations2 = [[], ['wrote', 'age'], ['contain']]
     paths.appendRelations(top3Relations2)
     assert(paths.getRelations() == ['wrote', 'age', 'contain'])
     # after entity exploration
-    top3Entities2 = [['vegetarian', 'human acts'], [], ['south korea']]
-    paths.appendEntities(top3Entities2)
-    assert(paths.getEntities() == ['vegetarian', 'human acts', 'south korea'])
+    top3IdEntities2 = [[('m4', 'vegetarian'), ('m5', 'human_acts')], [], [('m6', 'south_korea')]]
+    paths.appendEntities(top3IdEntities2)
+    assert(paths.getEntities() == ['vegetarian', 'human_acts', 'south_korea'])
 
-    print("< final paths >")
+    print("<<<<< final paths >>>>>")
     paths.print()
-
-    print("< pass pathsTest >")
 
 def searcherTest():
+    print("<<<<< searcherTest start >>>>>")
     searcher = Searcher()
-    topicEntities = ['canberra']
-    paths = Paths(topicEntities)
+    topicIdEntities = [("m.02qmnw","Ovadia Yosef")]
+    paths = Paths(topicIdEntities)
     # relation exploration
     relationLists = searcher.relationSearch(paths)
-    top3Relations = [relationList[0] for relationList in relationLists]
+    top3Relations = [relationList[:3] for relationList in relationLists]
     paths.appendRelations(top3Relations)
-    # entity exploration
-    entityLists = searcher.relationSearch(paths)
-    top3Entities = [entityList[0] for entityList in entityLists]
-    paths.appendEntities(top3Entities)
-
+    print("<<<<< after relation exploration >>>>>")
     paths.print()
-    
-    print("< pass searcherTest >")
+    # entity exploration
+    idEntityLists = searcher.entitySearch(paths)
+    top3IdEntities = [idEntityList[:3] for idEntityList in idEntityLists]
+    paths.appendEntities(top3IdEntities)
+    print("<<<<< after entity exploration >>>>>")
+    paths.print()
 
 def llmTest():
+    print("<<<<< llmTest start >>>>>")
     llm = Llm()
     question = "what is the capital of South Korea?"
-    topicEntities = ['South Korea']
-    paths = Paths(topicEntities)
-    print("< start >")
+    topicIdEntities = [('m0', 'South Korea')]
+    paths = Paths(topicIdEntities)
     print("Q: ", question)
-    print("topics: ", topicEntities)
+    print("topics: ", topicIdEntities)
     paths.print()
     # relation exploration
-    relationCandidates = [['locate at', 'population', 'territorial size', 'neighbor of', 'capital of']]
+    relationCandidates = [['locate_at', 'population', 'territorial_size', 'neighbor_of', 'capital_of']]
     top3Relations = llm.relationPrune(question, paths, relationCandidates)
     paths.appendRelations(top3Relations)
-    print("< after relation exploration >")
+    print("<<<<< after relation exploration >>>>>")
     paths.print()
     # entity exploration
-    entityCandidates = [['Seoul'], ['Asia', 'East Asia', 'Earth'], ['Japan', 'China', 'Russia']]
-    top3Entities = llm.entityPrune(question, paths, entityCandidates)
-    paths.appendEntities(top3Entities)
-    print("< after entity exploration >")
+    idEntityCandidates = [[('m1', 'Asia'), ('m2', 'East_Asia'), ('m3', 'Earth')], [('m4', 'Seoul'), ('m5', 'busan')], [('m6', '10000'), ('m7', '58931230'), ('m8', '47330')]]
+    top3IdEntities = llm.entityPrune(question, paths, idEntityCandidates)
+    paths.appendEntities(top3IdEntities)
+    print("<<<<< after entity exploration >>>>>")
     paths.print()
     
     if llm.isEnoughToAnswer(question, paths):
@@ -74,22 +73,34 @@ def llmTest():
     else:
         print("Need more informations")
     
-    print("< answer >")
+    print("<<<<< answer >>>>>")
     print(llm.generateAnswer(question, paths))
     paths.print()
 
-    print("< pass llmTest >")
-
 def toGTest():
+    print("<<<<< toGTest start >>>>>")
     toG = ToG()
-    question = "what is the capital of South Korea?"
-    topicEntities = ['South Korea']
-    answer = toG.inference(question, topicEntities)
-    print("answer: " + answer)
+    question = "when is the last time the the team has a team moscot named Lou Seal won the world series"
+    topicEntities = [('m.03_dwn', 'Lou Seal')]
+    answer, paths = toG.inference(question, topicEntities)
+    print("<<<< answer >>>>>")
+    print(answer)
+    paths.print()
 
-    print("pass toGTest")
+print("""
+choose test number
+      1. pathsTest
+      2. searcherTest
+      3. llmTest
+      4. toGTest
+""")
+testNumber = int(input(">> "))
 
-pathsTest()
-# searcherTest()
-llmTest()
-toGTest()
+if testNumber == 1:
+    pathsTest()
+elif testNumber == 2:
+    searcherTest()
+elif testNumber == 3:
+    llmTest()
+elif testNumber == 4:
+    toGTest()
