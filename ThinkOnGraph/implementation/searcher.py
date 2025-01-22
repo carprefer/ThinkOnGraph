@@ -33,36 +33,49 @@ class Searcher:
  
         idEntityLists = [[] for _ in entityIds]
         for i in range(len(entityIds)):
+            if entityIds[i] == 'None' or relations[i] == 'http://www.w3.org/2002/07/owl#sameAs':
+                idEntityLists[i] = [('None', 'None')]
+                continue
+
             for result in getSparqlResults(queryMaker.entitySearchF(entityIds[i], relations[i])):
-                value = result['tailEntity']['value']
-                id = 'None'
-                entity = value
-                if 'http://rdf.freebase.com/ns/' in value:
-                    id = value.replace('http://rdf.freebase.com/ns/', '')
-                    mapping = getSparqlResults(queryMaker.id2entity(id))
-                    if len(mapping) > 0:
-                        entity = mapping[0]['tailEntity']['value']
+                value = result['tailEntity']['value'].replace('http://rdf.freebase.com/ns/', '')
+                if len(value) > 1 and (value[:2] == 'g.' or value[:2] == 'm.'):
+                    lavel = getSparqlResults(queryMaker.id2entity(value))
+                    if len(lavel) > 0:
+                        id = value
+                        entity = lavel[0]['tailEntity']['value']
                     else:
+                        id = value
                         entity = 'None'
-                    if(id[0] != 'm'):
-                        entity = id
-                        id = 'None'
+                else:
+                    id = 'None'
+                    entity = value
+
                 idEntityLists[i].append((id, entity))
             
             for result in getSparqlResults(queryMaker.entitySearchB(entityIds[i], relations[i])):
-                value = result['tailEntity']['value']
-                id = 'None'
-                entity = value
-                if 'http://rdf.freebase.com/ns/' in value:
-                    id = value.replace('http://rdf.freebase.com/ns/', '')
-                    mapping = getSparqlResults(queryMaker.id2entity(id))
-                    if len(mapping) > 0:
-                        entity = mapping[0]['tailEntity']['value']
+                value = result['tailEntity']['value'].replace('http://rdf.freebase.com/ns/', '')
+                if len(value) > 1 and (value[:2] == 'g.' or value[:2] == 'm.'):
+                    lavel = getSparqlResults(queryMaker.id2entity(value))
+                    if len(lavel) > 0:
+                        id = value
+                        entity = lavel[0]['tailEntity']['value']
                     else:
+                        id = value
                         entity = 'None'
-                    if(id[0] != 'm'):
-                        entity = id
-                        id = 'None'
+                else:
+                    id = 'None'
+                    entity = value
+
                 idEntityLists[i].append((id, entity))
+
+            if idEntityLists[i] == []:
+                idEntityLists[i] = [('None', 'None')]
         
         return idEntityLists
+
+mapping = getSparqlResults(queryMaker.id2entity('m.0fv4v'))
+
+ans = getSparqlResults(queryMaker.relationSearchF('m.03_dwt'))
+print(ans)
+print(mapping)

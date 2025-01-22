@@ -165,11 +165,15 @@ cd virtuoso-opensource/database/
 mv virtuoso.ini.sample virtuoso.ini
 
 mv /mnt/sde/shcha/FilterFreebase .
+mv /mnt/sde/shcha/f2bw .
 
 # ../bin/virtuoso-t -df # start the service in the shell
 ../bin/virtuoso-t  # start the service in the backend.
 
 ../bin/isql 1111 dba dba exec="ld_dir('.', 'FilterFreebase', 'http://freebase.com');"
+nohup ../bin/isql 1111 dba dba exec="rdf_loader_run();" &
+
+../bin/isql 1111 dba dba exec="ld_dir('.', 'f2bw', 'http://freebase.com');"
 nohup ../bin/isql 1111 dba dba exec="rdf_loader_run();" &
 ```
 

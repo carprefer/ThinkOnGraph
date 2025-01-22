@@ -1,5 +1,6 @@
 import json
 import random
+import time
 from toG import ToG
 
 dataPath = "../data/cwq.json"
@@ -14,12 +15,22 @@ with open(dataPath, 'r') as f:
 testDataset = random.sample(dataset, totalCount)
 
 correctCount = 0
-for data in testDataset:
+startTime = time.time()
+for i, data in enumerate(testDataset):
     question = data['machine_question']
     topicIdEntities = list(data['topic_entity'].items())
     groundTruth = data['answer']
-    answer = toG.inference(question, topicIdEntities)
+    print("====================================================================================")
+    print("question", i, ":", question)
+    print("topics:", topicIdEntities)
+    print("answer:", groundTruth)
+    (answer, paths) = toG.inference(question, topicIdEntities)
     if groundTruth in answer:
         correctCount += 1
 
 print("result: ", correctCount / totalCount)
+endTime = time.time()
+
+with open('evaluate.txt', 'w') as file:
+    file.write("result: " + str(correctCount / totalCount))
+    file.write("average time: " + str(endTime - startTime) + "/question")

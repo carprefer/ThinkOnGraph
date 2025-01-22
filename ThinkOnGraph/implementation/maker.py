@@ -66,8 +66,6 @@ A: '''
     
     def entityPrune(self, question: str, currentRelation: str, entities: list[str], retrieveNum: int):
         return f'''
-Given a question and a relation, represent the relevance of each entity as a score between 0 and 1. (the sum of the scores of all entities is 1).
-Please complete the score in the format shown below.
 Q: The movie featured Miley Cyrus and was produced by Tobin Armbrust?
 Relation: film.producer.film
 Entites: The Resident; So Undercover; Let Me In; Begin Again; The Quiet Ones; A Walk Among the Tombstones
@@ -79,6 +77,8 @@ The movie that matches the given criteria is "So Undercover" with Miley Cyrus an
 {{Begin Again (Score: 0.0)}}
 {{The Quiet Ones (Score: 0.0)}}
 {{A Walk Among the Tombstones (Score: 0.0)}}
+
+Given a question and a relation, represent the relevance of each entity as a score between 0 and 1. (the sum of the scores of all entities is 1).
 
 Q: {question}
 Relation: {currentRelation}

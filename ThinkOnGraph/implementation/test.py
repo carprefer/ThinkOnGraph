@@ -41,7 +41,7 @@ def searcherTest():
     paths.print()
     # entity exploration
     idEntityLists = searcher.entitySearch(paths)
-    top3IdEntities = [idEntityList[:3] for idEntityList in idEntityLists]
+    top3IdEntities = [[idEntityList[0]] for idEntityList in idEntityLists]
     paths.appendEntities(top3IdEntities)
     print("<<<<< after entity exploration >>>>>")
     paths.print()
@@ -80,12 +80,17 @@ def llmTest():
 def toGTest():
     print("<<<<< toGTest start >>>>>")
     toG = ToG()
-    question = "when is the last time the the team has a team moscot named Lou Seal won the world series"
-    topicEntities = [('m.03_dwn', 'Lou Seal')]
+    question = "where did the artist had a concert tour named Country Nation World Tour graduate from college"
+    topicEntities = [('m.010qhfmm', 'Country Nation World Tour')]
     answer, paths = toG.inference(question, topicEntities)
     print("<<<< answer >>>>>")
     print(answer)
     paths.print()
+
+    if 'Belmont University' in answer:
+        print("correct !!!!!")
+    else:
+        print("fail !!!!!")
 
 print("""
 choose test number

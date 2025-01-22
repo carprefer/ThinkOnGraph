@@ -7,7 +7,10 @@ class Parser:
         for coreText in coreTexts:
             coreRawList = coreText.split(' ')
             relation = coreRawList[0]
-            score = float(coreRawList[2][:-1])
+            if 'Score' not in coreText:
+                score = 0.0
+            else: 
+                score = float(coreRawList[2][:-1])
             coreInfos.append((relation, score, index))
 
         return coreInfos

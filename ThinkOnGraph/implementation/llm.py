@@ -30,8 +30,9 @@ class Llama:
             model=self.model, 
             tokenizer=self.tokenizer,
             device_map="auto", 
+            do_sample=True,
             temperature=temperature,
-            do_sample=False,
+            top_k=20,
             max_length=12000,
             )
         outputs = generator(messages)
@@ -104,7 +105,7 @@ class Llm:
         assert all(len(triple) == 3 for path in triplePaths for triple in path)
 
         prompt = promptMaker.reasoning(question, triplePaths)
-        answer = self.llama.answer(prompt, 0.0)
+        answer = self.llama.answer(prompt, 0.01)
         assert 'Yes' in answer or 'No' in answer
 
         return 'Yes' in answer
@@ -115,5 +116,5 @@ class Llm:
         assert all(len(triple) == 3 for path in triplePaths for triple in path)
 
         prompt = promptMaker.generate(question, triplePaths)
-        return self.llama.answer(prompt, 0.0)
+        return self.llama.answer(prompt, 0.01)
     
