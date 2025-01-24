@@ -12,14 +12,14 @@ class Llama:
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         quantization_config = BitsAndBytesConfig(load_in_8bit=True)
-        modelName = 'meta-llama/Llama-2-70b-chat-hf'
+        modelName = 'meta-llama/Llama-2-7b-chat-hf'
         self.tokenizer = AutoTokenizer.from_pretrained(modelName, token=True)
         self.model = AutoModelForCausalLM.from_pretrained(
             modelName, 
             token=True, 
             device_map='auto',
-            #torch_dtype=torch.float16,
-            quantization_config=quantization_config
+            torch_dtype=torch.float16,
+            #quantization_config=quantization_config
         )
 
     def answer(self, prompt: str, temperature: float) -> str:
@@ -130,6 +130,6 @@ class Llm:
     
 #llm = Llama()
 
-#inputText = """What is the genre of game friday the 13th?"""
+#inputText = "hello"
 #answer = llm.answer(inputText, 0.4)
 #print(answer)

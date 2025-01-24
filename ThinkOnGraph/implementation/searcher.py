@@ -5,7 +5,7 @@ from paths import Paths
 from maker import queryMaker
 
 SPARQLPATH = "http://localhost:8890/sparql"
-MAXCANDIDATES = 10
+MAXCANDIDATES = 20
 
 # example: [result['relation']['value'] for result in getSparqlResults(query)]
 def getSparqlResults(query):
@@ -82,7 +82,11 @@ class Searcher:
                 idEntityLists[i] = random.sample(idEntityLists[i], MAXCANDIDATES)
         
         return idEntityLists
+    
+    def aliasSearch(self, entityName):
+        return list(map(lambda x: x['alias']['value'], getSparqlResults(queryMaker.findAlias(entityName))))
 
 #while(True):
 #   id = input("> ")
-print(getSparqlResults(queryMaker.id2entity('m.0ztjmpt')))
+print(getSparqlResults(queryMaker.entity2id("music.artist")))
+print(getSparqlResults(queryMaker.findAlias("Korea")))

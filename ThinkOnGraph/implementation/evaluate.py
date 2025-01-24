@@ -2,15 +2,19 @@ from dataLoader import *
 import time
 from toG import ToG
 import re
+from searcher import Searcher
+
+searcher = Searcher()
 
 def isExactAnswer(ground, answer):
-    cleanGround = ground.replace(' ','').lower()
+    grounds = searcher.aliasSearch(ground) + [ground]
+    cleanGrounds = [g.replace(' ','').lower() for g in grounds] 
     cleanAnswerList = re.findall(r'\{(.*?)\}', answer)
     if cleanAnswerList == []:
         cleanAnswer = answer.replace(' ','').lower()
     else:
         cleanAnswer = cleanAnswerList[0].replace(' ','').lower()
-    return (cleanGround in cleanAnswer) or (cleanAnswer in cleanGround)
+    return any((cleanGround in cleanAnswer) or (cleanAnswer in cleanGround) for cleanGround in cleanGrounds)
 
 totalCount = 100
 
@@ -22,7 +26,7 @@ llmOnlyCorrectCount = 0
 workingCount = 0
 startTime = time.time()
 
-dataset = cwqLoader(totalCount)
+dataset = simpleQALoader(totalCount)
 for i, (question, topicIdEntities, grounds) in enumerate(dataset):
     print("====================================================================================")
     print("question", i, ":", question)

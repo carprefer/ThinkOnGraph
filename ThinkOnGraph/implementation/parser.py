@@ -34,9 +34,9 @@ class Parser:
     def afterEntityPrune(self, answer: str, entities, index: int, length: int) -> list[tuple[str, float, int]]:
         coreTexts = re.findall(r'\{(.*?)\}', answer)
         coreInfos = []
-        if coreTexts == [] or coreTexts[0].replace(' ','') == '':
+        if coreTexts == [] or any(coreText.replace(' ','') == '' for coreText in coreTexts):
             return [('None', 0.0, index)]
-        scores = list(map(float, coreTexts[0].split(', ')))
+        scores = list(map(float, coreTexts))
         for i in range(min(len(entities), len(scores))):
             coreInfos.append((entities[i], scores[i], index))
         
