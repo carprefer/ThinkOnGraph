@@ -38,8 +38,8 @@ class Searcher:
  
         idEntityLists = [[] for _ in entityIds]
         for i in range(len(entityIds)):
-            if entityIds[i] == 'None' or 'http://www.w3.org/2002/07/' in relations[i]:
-                idEntityLists[i] = [('None', 'None')]
+            if entityIds[i] == 'Unknown-Id' or 'http://www.w3.org/2002/07/' in relations[i]:
+                idEntityLists[i] = [('Unknown-Id', 'Unknown-Entity')]
                 continue
             
 
@@ -52,9 +52,9 @@ class Searcher:
                         entity = lavel[0]['tailEntity']['value']
                     else:
                         id = value
-                        entity = 'None'
+                        entity = 'Unknown-Entity'
                 else:
-                    id = 'None'
+                    id = 'Unknown-Id'
                     entity = value
 
                 idEntityLists[i].append((id, entity))
@@ -68,15 +68,15 @@ class Searcher:
                         entity = lavel[0]['tailEntity']['value']
                     else:
                         id = value
-                        entity = 'None'
+                        entity = 'Unknown-Entity'
                 else:
-                    id = 'None'
+                    id = 'Unknown-Entity'
                     entity = value
 
                 idEntityLists[i].append((id, entity))
 
             if idEntityLists[i] == []:
-                idEntityLists[i] = [('None', 'None')]
+                idEntityLists[i] = [('Unknown-Id', 'Unknown-Entity')]
             
             if len(idEntityLists[i]) > MAXCANDIDATES:
                 idEntityLists[i] = random.sample(idEntityLists[i], MAXCANDIDATES)

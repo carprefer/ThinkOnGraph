@@ -56,13 +56,10 @@ class ToG:
                 useTriples = True
                 break
 
-            if all(entity == 'None' for entity in paths.getEntities()):
+            if all(entity == 'Unknown-Entity' for entity in paths.getEntities()):
                 print("quick stop !!!")
                 break
             depth += 1
 
         answer = self.llm.generateAnswer(question, paths, True)
-        print("========================================================")
-        print(answer)
-        paths.print()
         return (answer, paths, useTriples)

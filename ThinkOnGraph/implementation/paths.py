@@ -29,7 +29,7 @@ class Paths:
         def getTriplePath(path: list[str]) -> list[tuple]:
             assert len(path) % 2 == 1 and len(path) >= 3
             assert len(path) <= self.maxDepth * 2 + 1
-            return [(path[i][1].replace('None', ''), path[i+1], path[i+2][1].replace('None', '')) for i in range(0, len(path) - 2, 2)]
+            return [(path[i][1], path[i+1], path[i+2][1]) for i in range(0, len(path) - 2, 2)]
         
         return [getTriplePath(path) for path in self.paths]
 

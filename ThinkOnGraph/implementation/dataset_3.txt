@@ -1,0 +1,10 @@
+nohup: ignoring input
+[]
+[{'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.048fz'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Corea'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.048fz'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Hermit kingdom'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.03h5bb_'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea, Kentucky'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.04t3hk4'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea: A Walk Through the Land of Miracles'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.04c20mj'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea, Virginia'}}]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:01<00:01,  1.97s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:03<00:00,  1.44s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:03<00:00,  1.52s/it]
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0

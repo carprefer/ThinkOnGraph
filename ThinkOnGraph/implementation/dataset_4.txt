@@ -1,0 +1,116 @@
+nohup: ignoring input
+[]
+[{'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.048fz'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Corea'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.048fz'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Hermit kingdom'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.03h5bb_'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea, Kentucky'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.04t3hk4'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea: A Walk Through the Land of Miracles'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.04c20mj'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea, Virginia'}}]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:02<00:02,  2.04s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:03<00:00,  1.43s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:03<00:00,  1.53s/it]
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+====================================================================================
+question 0 : when does the wsop main event start?
+topics: [('m.0820c', 'World Series Of Poker')]
+grounds: <filter object at 0x7f9a78ac2a40>
+========================================================
+depth:  0
+<relation candidates>
+[['time.recurring_event.instances', 'common.topic.webpage', 'time.recurring_event.date_of_first_occurance', 'type.object.type', 'common.topic.article', 'common.topic.description', 'common.webpage.topic', 'time.event.instance_of_recurring_event', 'http://www.w3.org/2002/07/owl#sameAs', 'book.written_work.subjects', 'type.object.name', 'base.yupgrade.user.topics', 'book.book_subject.works', 'kg.object_profile.prominent_type', 'common.topic.notable_types', 'common.topic.notable_for', 'user.avh.default_domain.ellerdale_topic.ellerdale_id']]
+//////////////////////////////
+  Sure, I'd be happy to help! Here are 3 relations that contribute to the question "When does the WSOP main event start?" and their contribution scores:
+
+1. {time.recurring_event.instances (Score: 0.8)}: This relation is highly relevant as it directly relates to the recurring event of the WSOP main event and its instances over time.
+2. {common.topic.webpage (Score: 0.5)}: This relation is relevant as it provides a web page that is associated with the WSOP main event, which could potentially contain information on when it starts.
+3. {book.written_work.subjects (Score: 0.3)}: This relation is less relevant as it provides a list of subjects that are related to the WSOP main event, but does not directly answer the question of when it starts.
+
+Here are the 3 relations with their contribution scores:
+
+1. {time.recurring_event.instances (Score: 0.8)}
+2. {common.topic.webpage (Score: 0.5)}
+3. {book.written_work.subjects (Score: 0.3)}
+<top N relations>
+[['time.recurring_event.instances', 'time.recurring_event.instances', 'common.topic.webpage']]
+============================
+after relation exploration
+[('m.0820c', 'World Series Of Poker'), 'time.recurring_event.instances']
+[('m.0820c', 'World Series Of Poker'), 'time.recurring_event.instances']
+[('m.0820c', 'World Series Of Poker'), 'common.topic.webpage']
+<entity candidates>
+[[('m.09wghg', '1984 World Series of Poker'), ('m.09v_dp', '1989 World Series of Poker'), ('m.09wgk6', '1983 World Series of Poker'), ('m.09vz4c', '1993 World Series of Poker'), ('m.0b4z1z', '1971 World Series of Poker'), ('m.09w06w', '1987 World Series of Poker'), ('m.09vxz7', '1996 World Series of Poker'), ('m.09vzw6', '1991 World Series of Poker'), ('m.09vzj8', '1992 World Series of Poker'), ('m.09vy9w', '1995 World Series of Poker'), ('m.09vgh_', '1999 World Series of Poker'), ('m.09y833', '1976 World Series of Poker'), ('m.09whgb', '1980 World Series of Poker'), ('m.026b6kw', '2007 World Series of Poker'), ('m.09yz9h', '1975 World Series of Poker'), ('m.09v_8h', '1990 World Series of Poker'), ('m.09vflx', '2000 World Series of Poker'), ('m.09wk14', '1978 World Series of Poker'), ('m.09wh74', '1982 World Series of Poker'), ('m.09vywb', '1994 World Series of Poker')], [('m.09vy9w', '1995 World Series of Poker'), ('m.08sc15', '2006 World Series of Poker'), ('m.09vcvq', '2003 World Series of Poker'), ('m.09v_dp', '1989 World Series of Poker'), ('m.09wgk6', '1983 World Series of Poker'), ('m.09vgh_', '1999 World Series of Poker'), ('m.09vxr2', '1997 World Series of Poker'), ('m.09w1v5', '1985 World Series of Poker'), ('m.0b4z1z', '1971 World Series of Poker'), ('m.09wghg', '1984 World Series of Poker'), ('m.09v_nn', '1988 World Series of Poker'), ('m.0j27j4d', '2012 World Series of Poker'), ('m.09w1kh', '1986 World Series of Poker'), ('m.09vzj8', '1992 World Series of Poker'), ('m.09wkqn', '1977 World Series of Poker'), ('m.0b4ytv', '1973 World Series of Poker'), ('m.026b6kw', '2007 World Series of Poker'), ('m.09vgv0', '1998 World Series of Poker'), ('m.06v2nv', '2004 World Series of Poker'), ('m.09v_8h', '1990 World Series of Poker')], [('m.05nn2jf', 'Unknown-Entity'), ('m.0dw9g9b', 'Unknown-Entity'), ('m.0b6r770', 'Unknown-Entity')]]
+//////////////////////////////
+
+<s>[INST] <<SYS>>
+Belows are examples. Please follow this format to answer.(Use {})
+
+Example 1.
+Q: The movie featured Miley Cyrus and was produced by Tobin Armbrust?
+Relation: film.producer.film
+Entites: The Resident; So Undercover; Let Me In; Begin Again; The Quiet Ones; A Walk Among the Tombstones
+Score: 
+* The Resident: {0.0}
+* So Undercover: {1.0}
+* Let Me In: {0.2}
+* Begin Again: {0.1}
+* The Quiet Ones: {0.1}
+* A Walk Among the Tombstones: {0.1}
+
+Example 2.
+Q: what is the beaufort wind force for deep depression (imd)?
+Relation: meteorology.tropical_cyclone_category.Beaufort_scale
+Entities: Beaufort force 7
+Score:
+* Beaufort force 7: {0.7}
+<</SYS>>
+
+Please score the entities' contribution to the question on a scale from 0 to 1
+Q: when does the wsop main event start?
+Relation: time.recurring_event.instances
+Entities: 1984 World Series of Poker; 1989 World Series of Poker; 1983 World Series of Poker; 1993 World Series of Poker; 1971 World Series of Poker; 1987 World Series of Poker; 1996 World Series of Poker; 1991 World Series of Poker; 1992 World Series of Poker; 1995 World Series of Poker; 1999 World Series of Poker; 1976 World Series of Poker; 1980 World Series of Poker; 2007 World Series of Poker; 1975 World Series of Poker; 1990 World Series of Poker; 2000 World Series of Poker; 1978 World Series of Poker; 1982 World Series of Poker; 1994 World Series of Poker
+Score: 
+[/INST]
+  Of course! I'd be happy to help you with that. Please provide the next question and I'll score the entities' contribution accordingly.
+//////////////////////////////
+
+<s>[INST] <<SYS>>
+Belows are examples. Please follow this format to answer.(Use {})
+
+Example 1.
+Q: The movie featured Miley Cyrus and was produced by Tobin Armbrust?
+Relation: film.producer.film
+Entites: The Resident; So Undercover; Let Me In; Begin Again; The Quiet Ones; A Walk Among the Tombstones
+Score: 
+* The Resident: {0.0}
+* So Undercover: {1.0}
+* Let Me In: {0.2}
+* Begin Again: {0.1}
+* The Quiet Ones: {0.1}
+* A Walk Among the Tombstones: {0.1}
+
+Example 2.
+Q: what is the beaufort wind force for deep depression (imd)?
+Relation: meteorology.tropical_cyclone_category.Beaufort_scale
+Entities: Beaufort force 7
+Score:
+* Beaufort force 7: {0.7}
+<</SYS>>
+
+Please score the entities' contribution to the question on a scale from 0 to 1
+Q: when does the wsop main event start?
+Relation: time.recurring_event.instances
+Entities: 1995 World Series of Poker; 2006 World Series of Poker; 2003 World Series of Poker; 1989 World Series of Poker; 1983 World Series of Poker; 1999 World Series of Poker; 1997 World Series of Poker; 1985 World Series of Poker; 1971 World Series of Poker; 1984 World Series of Poker; 1988 World Series of Poker; 2012 World Series of Poker; 1986 World Series of Poker; 1992 World Series of Poker; 1977 World Series of Poker; 1973 World Series of Poker; 2007 World Series of Poker; 1998 World Series of Poker; 2004 World Series of Poker; 1990 World Series of Poker
+Score: 
+[/INST]
+  Of course! I'd be happy to help you with that. Please provide the next example question, and I'll follow the format you provided to score the entities' contribution to the question.
+<top N entities>
+[[('m.0b6r770', 'Unknown-Entity')], [('m.0b6r770', 'Unknown-Entity')], [('m.0b6r770', 'Unknown-Entity')]]
+============================
+after entity exploration
+[('m.0820c', 'World Series Of Poker'), 'time.recurring_event.instances', ('m.0b6r770', 'Unknown-Entity')]
+[('m.0820c', 'World Series Of Poker'), 'time.recurring_event.instances', ('m.0b6r770', 'Unknown-Entity')]
+[('m.0820c', 'World Series Of Poker'), 'common.topic.webpage', ('m.0b6r770', 'Unknown-Entity')]
+============================
+reasoning ...
+quick stop !!!
+====================================================================================
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0

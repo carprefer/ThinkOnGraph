@@ -1,0 +1,148 @@
+nohup: ignoring input
+[]
+[{'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.048fz'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Corea'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.048fz'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Hermit kingdom'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.03h5bb_'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea, Kentucky'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.04t3hk4'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea: A Walk Through the Land of Miracles'}}, {'entity': {'type': 'uri', 'value': 'http://rdf.freebase.com/ns/m.04c20mj'}, 'alias': {'type': 'literal', 'xml:lang': 'en', 'value': 'Korea, Virginia'}}]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:02<00:02,  2.05s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:03<00:00,  1.45s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:03<00:00,  1.54s/it]
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+Device set to use cuda:0
+====================================================================================
+question 0 : the author who published editions for The Correspondence of Charles Darwin, Volume 12 married to
+topics: [('m.04vrrwl', 'The Correspondence of Charles Darwin, Volume 12'), ('m.04ztj', 'Marriage')]
+grounds: ['Emma Darwin']
+========================================================
+depth:  0
+<relation candidates>
+[['book.publishing_company.books_published', 'book.book.editions', 'type.object.name', 'book.book_edition.publisher', 'book.book_edition.author_editor', 'book.book_edition.publication_date', 'media_common.cataloged_instance.isbn13', 'book.book_edition.binding', 'common.topic.notable_for', 'book.book_edition.isbn', 'book.author.book_editions_published', 'kg.object_profile.prominent_type', 'book.isbn.book_editions', 'type.object.type', 'book.book_edition.book', 'book.book_edition.ISBN', 'common.topic.notable_types'], ['user.avh.default_domain.ellerdale_topic.ellerdale_id', 'freebase.review_flag.item', 'kg.object_profile.prominent_type', 'type.object.name', 'religion.religion.practices', 'http://www.w3.org/2002/07/owl#sameAs', 'user.tsegaran.random.taxonomy_subject.entry', 'base.skosbase.vocabulary_equivalent_topic.equivalent_concept', 'base.ontologies.ontology_instance.equivalent_instances', 'freebase.equivalent_topic.equivalent_type', 'media_common.quotation_source.quotationsbook_id', 'law.legal_subject.legal_cases', 'common.webpage.topic', 'tv.tv_subject.tv_programs', 'visual_art.art_subject.artwork_on_the_subject', 'religion.religious_practice.practice_of', 'common.topic.subjects', 'book.book_subject.works', 'dataworld.gardening_hint.replaced_by', 'common.topic.description']]
+//////////////////////////////
+  Sure, I'd be happy to help! Here are 3 relations that contribute to the question "the author who published editions for The Correspondence of Charles Darwin, Volume 12 married to" and their contribution scores:
+
+1. {book.author.book_editions_published (Score: 0.8)}: This relation is highly relevant as it directly relates to the author who published editions of The Correspondence of Charles Darwin, Volume 12.
+2. {book.book_edition.publisher (Score: 0.7)}: This relation is also relevant as it provides the name of the publishing company that published the edition of The Correspondence of Charles Darwin, Volume 12 being asked about.
+3. {common.topic.notable_types (Score: 0.4)}: This relation is less relevant but still provides some context on the types of notable books or authors that The Correspondence of Charles Darwin, Volume 12 is associated with, which could help identify the author's married name.
+
+Please let me know if you have any other questions!
+//////////////////////////////
+  Sure! Here are three relations that contribute to the question "the author who published editions for The Correspondence of Charles Darwin, Volume 12 married to" and their contribution scores:
+
+1. {user.avh.default_domain.ellerdale_topic.ellerdale_id (Score: 0.8)}: This relation is highly relevant as it directly relates to the author's identity and the topic of marriage.
+2. {kg.object_profile.prominent_type (Score: 0.6)}: This relation is relevant as it provides information on the type of object or topic that the author is associated with, which could help identify the context of the marriage.
+3. {freebase.equivalent_topic.equivalent_type (Score: 0.4)}: This relation is less relevant but still provides some context on the types of equivalent topics or objects that the author is associated with, which could help narrow down the search for the married author.
+
+Note: The contribution scores are based on the relevance of each relation to the question and are on a scale of 0 to 1.
+<top N relations>
+[['book.author.book_editions_published', 'book.book_edition.publisher'], ['user.avh.default_domain.ellerdale_topic.ellerdale_id']]
+============================
+after relation exploration
+[('m.04vrrwl', 'The Correspondence of Charles Darwin, Volume 12'), 'book.author.book_editions_published']
+[('m.04vrrwl', 'The Correspondence of Charles Darwin, Volume 12'), 'book.book_edition.publisher']
+[('m.04ztj', 'Marriage'), 'user.avh.default_domain.ellerdale_topic.ellerdale_id']
+<entity candidates>
+[[('m.01lwx', 'Charles Darwin')], [('m.0jp0j', 'Cambridge University Press')], [('Unknown-Id', '0080-048b')]]
+//////////////////////////////
+
+<s>[INST] <<SYS>>
+Belows are examples. Please follow this format to answer.(Use {})
+
+Example 1.
+Q: The movie featured Miley Cyrus and was produced by Tobin Armbrust?
+Relation: film.producer.film
+Entites: The Resident; So Undercover; Let Me In; Begin Again; The Quiet Ones; A Walk Among the Tombstones
+Score: 
+* The Resident: {0.0}
+* So Undercover: {1.0}
+* Let Me In: {0.2}
+* Begin Again: {0.1}
+* The Quiet Ones: {0.1}
+* A Walk Among the Tombstones: {0.1}
+
+Example 2.
+Q: what is the beaufort wind force for deep depression (imd)?
+Relation: meteorology.tropical_cyclone_category.Beaufort_scale
+Entities: Beaufort force 7
+Score:
+* Beaufort force 7: {0.7}
+<</SYS>>
+
+Please score the entities' contribution to the question on a scale from 0 to 1
+Q: the author who published editions for The Correspondence of Charles Darwin, Volume 12 married to
+Relation: book.author.book_editions_published
+Entities: Charles Darwin
+Score: 
+[/INST]
+  Of course! I'd be happy to help you with this. Please provide the next set of examples, and I'll follow the format you've provided to score the entities' contribution to the question.
+//////////////////////////////
+
+<s>[INST] <<SYS>>
+Belows are examples. Please follow this format to answer.(Use {})
+
+Example 1.
+Q: The movie featured Miley Cyrus and was produced by Tobin Armbrust?
+Relation: film.producer.film
+Entites: The Resident; So Undercover; Let Me In; Begin Again; The Quiet Ones; A Walk Among the Tombstones
+Score: 
+* The Resident: {0.0}
+* So Undercover: {1.0}
+* Let Me In: {0.2}
+* Begin Again: {0.1}
+* The Quiet Ones: {0.1}
+* A Walk Among the Tombstones: {0.1}
+
+Example 2.
+Q: what is the beaufort wind force for deep depression (imd)?
+Relation: meteorology.tropical_cyclone_category.Beaufort_scale
+Entities: Beaufort force 7
+Score:
+* Beaufort force 7: {0.7}
+<</SYS>>
+
+Please score the entities' contribution to the question on a scale from 0 to 1
+Q: the author who published editions for The Correspondence of Charles Darwin, Volume 12 married to
+Relation: book.book_edition.publisher
+Entities: Cambridge University Press
+Score: 
+[/INST]
+  Of course! I'd be happy to help you with this. Here are the scores for the entities in each example:
+
+Example 1:
+
+Q: The movie featured Miley Cyrus and was produced by Tobin Armbrust?
+
+Relation: film.producer.film
+Entities: The Resident; So Undercover; Let Me In; Begin Again; The Quiet Ones; A Walk Among the Tombstones
+
+Score:
+
+* The Resident: {0.0}
+* So Undercover: {1.0}
+* Let Me In: {0.2}
+* Begin Again: {0.1}
+* The Quiet Ones: {0.1}
+* A Walk Among the Tombstones: {0.1}
+
+Example 2:
+
+Q: what is the beaufort wind force for deep depression (imd)?
+
+Relation: meteorology.tropical_cyclone_category.Beaufort_scale
+Entities: Beaufort force 7
+
+Score:
+
+* Beaufort force 7: {0.7}
+
+Example 3:
+
+Q: the author who published editions for The Correspondence of Charles Darwin, Volume 12 married to
+
+Relation: book.book_edition.publisher
+Entities: Cambridge University Press
+
+Score:
+
+* Cambridge University Press: {1.0}
+
+I hope this helps! Let me know if you have any other questions.
+//////////////////////////////
+Device set to use cuda:0

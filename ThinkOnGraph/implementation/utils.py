@@ -16,7 +16,7 @@ def isExactAnswer(grounds, answer):
     cleanAnswers = parser.makeCleans(parser.llmAnswer(answer))
     cleanAnswer = parser.makeClean(answer)
 
-    if any(ca in cg or cg in ca for cg in cleanGrounds for ca in cleanAnswers):
+    if any((ca in cg) or (cg in ca) for cg in cleanGrounds for ca in cleanAnswers):
         return True
     elif any(cg in cleanAnswer for cg in cleanGrounds):
         return True

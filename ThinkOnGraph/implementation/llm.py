@@ -25,9 +25,6 @@ class Llama:
     def answer(self, prompt: str, temperature: float) -> str:
         assert temperature >= 0 and temperature <= 1
         assert len(prompt) >= 10
-        messages = [
-            {"role": "user", "content": prompt},
-        ]
         generator = pipeline(
             "text-generation", 
             model=self.model, 
@@ -37,7 +34,7 @@ class Llama:
             temperature=temperature,
             top_k=50,
             )
-        outputs = generator(messages)
+        outputs = generator([{"role": "user", "content": prompt},])
         return outputs[0]['generated_text'][1]['content']
 
 class Llm:
@@ -61,8 +58,8 @@ class Llm:
         entityCandidatesWithScore: list[tuple] = []
         for i in range(len(relations)):
             entityCandidates = list(map(lambda x: x[1], idEntityCandidates[i]))
-            if all(entityCandidate == 'None' for entityCandidate in entityCandidates):
-                entityCandidatesWithScore.append(('None', 0.0, i))
+            if all(entityCandidate == 'Unknown-Entity' for entityCandidate in entityCandidates):
+                entityCandidatesWithScore.append(('Unknown-Entity', 0.0, i))
                 continue
             prompt = promptMaker.entityPrune(question, relations[i], entityCandidates, 3)
             answer = self.llama.answer(prompt, 0.4)
@@ -75,7 +72,7 @@ class Llm:
         entitiesWithScore = sorted(entityCandidatesWithScore, key=lambda x: x[1], reverse=True)[:width]
         idEntities = [[] for _ in relations]    # it's length can be different with 'width'
         for (entity, score, index) in entitiesWithScore:
-            id = entity2idDict[entity] if entity in entity2idDict else 'None'
+            id = entity2idDict[entity] if entity in entity2idDict else 'Unknown-Id'
             idEntities[index].append((id, entity))
 
         return idEntities
@@ -128,8 +125,8 @@ class Llm:
             prompt = promptMaker.generate(question, triplePaths)
         return self.llama.answer(prompt, 0.01)
     
-#llm = Llama()
+#llm = Llama('meta-llama/Llama-2-7b-chat-hf')
 
-#inputText = "hello"
+#inputText = "hello what your name?"
 #answer = llm.answer(inputText, 0.4)
 #print(answer)

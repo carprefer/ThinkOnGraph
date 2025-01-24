@@ -20,7 +20,7 @@ class Parser:
                 index2 = tokens.index('2.')
                 index3 = tokens.index('3.')
             except ValueError:
-                return [('None', 0.0, index)]
+                return [('Unknown-Entity', 0.0, index)]
             coreInfos.append((tokens[index1 + 1], float(tokens[index1 + 3].replace('):','')), index))
             coreInfos.append((tokens[index2 + 1], float(tokens[index2 + 3].replace('):','')), index))
             coreInfos.append((tokens[index3 + 1], float(tokens[index3 + 3].replace('):','')), index))
@@ -36,7 +36,7 @@ class Parser:
             coreInfos.append((relation, score, index))
         
         if coreInfos == []:
-            coreInfos = [('None', 0.0, index)]
+            coreInfos = [('Unknown-Entity', 0.0, index)]
          
         return coreInfos
     
@@ -44,14 +44,14 @@ class Parser:
         coreTexts = re.findall(r'\{(.*?)\}', answer)
         coreInfos = []
         if coreTexts == [] or any(coreText.replace(' ','') == '' for coreText in coreTexts):
-            return [('None', 0.0, index)]
+            return [('Unknown-Entity', 0.0, index)]
         coreTexts = [coreText[-3:] for coreText in coreTexts]
         scores = list(map(float, coreTexts))
         for i in range(min(len(entities), len(scores))):
             coreInfos.append((entities[i], scores[i], index))
         
         if coreInfos == []:
-            coreInfos = [('None', 0.0, index)]
+            coreInfos = [('Unknown-Entity', 0.0, index)]
 
         return coreInfos
     
