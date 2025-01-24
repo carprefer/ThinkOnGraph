@@ -1,5 +1,6 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from transformers import BitsAndBytesConfig
 from maker import promptMaker
 from parser import parser 
 from paths import Paths
@@ -10,13 +11,15 @@ assert torch.cuda.is_available()
 class Llama:
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        modelName = 'meta-llama/Llama-2-7b-chat-hf'
+        quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+        modelName = 'meta-llama/Llama-2-70b-chat-hf'
         self.tokenizer = AutoTokenizer.from_pretrained(modelName, token=True)
         self.model = AutoModelForCausalLM.from_pretrained(
             modelName, 
             token=True, 
             device_map='auto',
-            torch_dtype=torch.float16
+            #torch_dtype=torch.float16,
+            quantization_config=quantization_config
         )
 
     def answer(self, prompt: str, temperature: float) -> str:
@@ -32,8 +35,7 @@ class Llama:
             device_map="auto", 
             do_sample=True,
             temperature=temperature,
-            top_k=20,
-            max_length=12000,
+            top_k=50,
             )
         outputs = generator(messages)
         return outputs[0]['generated_text'][1]['content']
@@ -58,12 +60,17 @@ class Llm:
 
         entityCandidatesWithScore: list[tuple] = []
         for i in range(len(relations)):
-            entityCandidates = map(lambda x: x[1], idEntityCandidates[i])
+            entityCandidates = list(map(lambda x: x[1], idEntityCandidates[i]))
+            if all(entityCandidate == 'None' for entityCandidate in entityCandidates):
+                entityCandidatesWithScore.append(('None', 0.0, i))
+                continue
             prompt = promptMaker.entityPrune(question, relations[i], entityCandidates, 3)
             answer = self.llama.answer(prompt, 0.4)
-
+            print("//////////////////////////////")
+            print(prompt)
+            print(answer)
             # TODO adjust parsing methods
-            entityCandidatesWithScore += parser.afterEntityPrune(answer, i, 3)
+            entityCandidatesWithScore += parser.afterEntityPrune(answer, entityCandidates, i, 3)
 
         entitiesWithScore = sorted(entityCandidatesWithScore, key=lambda x: x[1], reverse=True)[:width]
         idEntities = [[] for _ in relations]    # it's length can be different with 'width'
@@ -88,7 +95,8 @@ class Llm:
             # TODO adjust k(3)
             prompt = promptMaker.relationPrune(question, entities[i], relationCandidates[i], 3)
             answer = self.llama.answer(prompt, 0.4)
-
+            print("//////////////////////////////")
+            print(answer)
             # TODO adjust parsing methods
             relationCandidatesWithScore += parser.afterRelationPrune(answer, i)
 
@@ -110,11 +118,18 @@ class Llm:
 
         return 'Yes' in answer
 
-    def generateAnswer(self, question: str, paths: Paths) -> str:
+    def generateAnswer(self, question: str, paths: Paths, usePaths: bool) -> str:
         triplePaths: list[list[tuple[str, str, str]]] = paths.getTriplePaths()
         assert len(question) > 5
         assert all(len(triple) == 3 for path in triplePaths for triple in path)
-
-        prompt = promptMaker.generate(question, triplePaths)
+        if usePaths == False:
+            prompt = question
+        else:
+            prompt = promptMaker.generate(question, triplePaths)
         return self.llama.answer(prompt, 0.01)
     
+#llm = Llama()
+
+#inputText = """What is the genre of game friday the 13th?"""
+#answer = llm.answer(inputText, 0.4)
+#print(answer)

@@ -1,0 +1,2 @@
+result: 0.5
+detail: 5109average time: 121.36164288520813/question

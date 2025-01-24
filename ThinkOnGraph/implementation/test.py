@@ -74,7 +74,7 @@ def llmTest():
         print("Need more informations")
     
     print("<<<<< answer >>>>>")
-    print(llm.generateAnswer(question, paths))
+    print(llm.generateAnswer(question, paths, True))
     paths.print()
 
 def toGTest():
@@ -82,7 +82,7 @@ def toGTest():
     toG = ToG()
     question = "where did the artist had a concert tour named Country Nation World Tour graduate from college"
     topicEntities = [('m.010qhfmm', 'Country Nation World Tour')]
-    answer, paths = toG.inference(question, topicEntities)
+    answer, paths, useTriples = toG.inference(question, topicEntities)
     print("<<<< answer >>>>>")
     print(answer)
     paths.print()

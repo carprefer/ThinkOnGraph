@@ -10,6 +10,7 @@ class ToG:
     def inference(self, question: str, topicIdEntities: list[tuple[str, str]] = None) -> tuple[str, Paths]:
         maxDepth = 3
         width = 3
+        useTriples = False
         
         if topicIdEntities == None:
             # TODO extract topicEntities
@@ -47,12 +48,17 @@ class ToG:
             print("============================")
             print("reasoning ...")
             if self.llm.isEnoughToAnswer(question, paths):
+                print("enough information !!!")
+                useTriples = True
                 break
-            else:
-                depth += 1
 
-        answer = self.llm.generateAnswer(question, paths)
+            if all(entity == 'None' for entity in paths.getEntities()):
+                print("quick stop !!!")
+                break
+            depth += 1
+
+        answer = self.llm.generateAnswer(question, paths, True)
         print("========================================================")
         print(answer)
         paths.print()
-        return (answer, paths)
+        return (answer, paths, useTriples)

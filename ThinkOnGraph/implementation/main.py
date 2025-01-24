@@ -9,7 +9,8 @@ while(True):
         print("bye bye!")
         break
     topicEntities = input("topics: ")
-    answer, paths = toG.inference(question, topicEntities)
+    answer, paths, useTriples = toG.inference(question, topicEntities)
     print("anser: " + answer)
     print(paths)
+
 

@@ -85,11 +85,11 @@ class Llm:
 
 0. ~~개발환경 세팅~~
 1. ~~Paths class 구현 및 테스트~~
-2. Searcher class 구현 및 테스트
-3. Llm class 구현 및 테스트
-4. ToG 구현 및 테스트(1개 질문)
-5. 평가 데이터 관리 모듈 구현 및 테스트
-6. evluation 모듈 구현 및 테스트 
+2. ~~Searcher class 구현 및 테스트~~
+3. ~~Llm class 구현 및 테스트~~
+4. ~~ToG 구현 및 테스트(1개 질문)~~
+5. ~~평가 데이터 관리 모듈 구현 및 테스트~~
+6. ~~evluation 모듈 구현 및 테스트~~ 
 7. 100개의 data에 대하여 evaluation 진행
 
 ## Initial Setting
@@ -203,4 +203,14 @@ source ~/.bashrc
 ```shell
 conda install -c conda-forge transformers
 conda install accelerate
+pip install bitsandbytes
+```
+
+## ~~SGLANG~~
+```shell
+conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 pytorch-cuda=12.4 -c pytorch -c nvidia
+pip install --upgrade pip
+pip install "sglang[all]" --find-links https://flashinfer.ai/whl/cu124/torch2.4/flashinfer/
+
+python -m sglang.launch_server --model-path /mnt/sde/shcha/cache/hub/models--meta-llama--Llama-70b-chat-hf --tp 8
 ```
