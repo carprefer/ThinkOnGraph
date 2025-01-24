@@ -3,11 +3,15 @@ from searcher import Searcher
 from llm import Llm
 
 class ToG:
-    def __init__(self):
+    def __init__(self, modelName='meta-llama/Llama-2-7b-chat-hf', llmOnly=False):
         self.searcher = Searcher()
-        self.llm = Llm()
+        self.llm = Llm(modelName)
+        self.llmOnly = llmOnly
 
-    def inference(self, question: str, topicIdEntities: list[tuple[str, str]] = None) -> tuple[str, Paths]:
+    def inference(self, question: str, topicIdEntities: list[tuple[str, str]] = None) -> tuple[str, Paths, bool]:
+        if self.llmOnly:
+            return (self.llm.llama.answer(question, 0.01), Paths(), False)
+
         maxDepth = 3
         width = 3
         useTriples = False

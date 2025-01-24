@@ -38,7 +38,7 @@ class Searcher:
  
         idEntityLists = [[] for _ in entityIds]
         for i in range(len(entityIds)):
-            if entityIds[i] == 'None' or relations[i] == 'http://www.w3.org/2002/07/owl#sameAs':
+            if entityIds[i] == 'None' or 'http://www.w3.org/2002/07/' in relations[i]:
                 idEntityLists[i] = [('None', 'None')]
                 continue
             
@@ -84,8 +84,9 @@ class Searcher:
         return idEntityLists
     
     def aliasSearch(self, entityName):
-        return list(map(lambda x: x['alias']['value'], getSparqlResults(queryMaker.findAlias(entityName))))
+        return list(map(lambda x: x['alias']['value'], getSparqlResults(queryMaker.findAlias(entityName)))) + [entityName]
 
+searcher = Searcher()
 #while(True):
 #   id = input("> ")
 print(getSparqlResults(queryMaker.entity2id("music.artist")))

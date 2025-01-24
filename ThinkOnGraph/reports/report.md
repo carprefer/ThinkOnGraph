@@ -50,7 +50,7 @@ def inference(self, question: str, topicIdEntities: list[tuple[str, str]] = None
 | LLM | dataset | hit ratio |
 |-----|---------|-----------|
 | llama-2-7b-chat-hf | CWQ | 27.9% |
-| llama-2-7b-chat-hf | SimpleQA | 45.8% |
+| llama-2-7b-chat-hf | SimpleQA | 53.3% |
 
 
 

@@ -1,6 +1,15 @@
 import re
 
 class Parser:
+    def makeClean(self, text: str) -> list[str]:
+        return text.replace(' ', '').lower()
+    
+    def makeCleans(self, texts: list[str]) -> list[str]:
+        return [text.replace(' ','').lower() for text in texts]
+    
+    def llmAnswer(self, answer: str) -> list[str]:
+        return re.findall(r'\{(.*?)\}', answer)
+    
     def afterRelationPrune(self, answer: str, index: int) -> list[tuple[str, float, int]]:
         coreTexts = re.findall(r'\{(.*?)\}', answer)
         coreInfos = []
@@ -36,6 +45,7 @@ class Parser:
         coreInfos = []
         if coreTexts == [] or any(coreText.replace(' ','') == '' for coreText in coreTexts):
             return [('None', 0.0, index)]
+        coreTexts = [coreText[-3:] for coreText in coreTexts]
         scores = list(map(float, coreTexts))
         for i in range(min(len(entities), len(scores))):
             coreInfos.append((entities[i], scores[i], index))

@@ -9,10 +9,10 @@ assert torch.cuda.device_count() == 8
 assert torch.cuda.is_available()
 
 class Llama:
-    def __init__(self):
+    def __init__(self, modelName):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         quantization_config = BitsAndBytesConfig(load_in_8bit=True)
-        modelName = 'meta-llama/Llama-2-7b-chat-hf'
+        modelName = modelName
         self.tokenizer = AutoTokenizer.from_pretrained(modelName, token=True)
         self.model = AutoModelForCausalLM.from_pretrained(
             modelName, 
@@ -41,8 +41,8 @@ class Llama:
         return outputs[0]['generated_text'][1]['content']
 
 class Llm:
-    def __init__(self):
-        self.llama = Llama()
+    def __init__(self, modelName):
+        self.llama = Llama(modelName)
 
     # entity could be different after prune
     def entityPrune(self, question: str, paths: Paths, idEntityCandidates: list[list[tuple[str, str]]]) -> list[list[tuple[str, str]]]:
