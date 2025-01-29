@@ -35,12 +35,23 @@ def inference(self, question: str, topicEntities: list[tuple[str, str]], maxDept
 
 - Transformer pipeline을 통해 Llama-2-7b-chat-hf와 Llama-2-70b-chat-hf를 다운받아 사용.
 - prone 과정에서 LLM을 3번 돌려 각각 원소들에 점수를 매기고 상위 3개를 뽑는 식으로 구현.
-- prompt의 경우, 질문을 이해하지 못하는 경우가 있어 약간 수정해서 사용.
+- prompt의 경우, 질문을 이해하지 못하는 경우가 있어 다음과 같이 약간 수정해서 사용.
+[[Link]](https://medium.com/@eboraks/llama-2-prompt-engineering-extracting-information-from-articles-examples-45158ff9bd23
+)
 ```
-<s> [INST] <<SYS>> system msg <</SYS>> few-shots </s> <s>[INST] user msg [/INST]
+<s> [INST] <<SYS>> 
+system msg 
+<</SYS>> 
+
+example question [/INST]
+example answer
+</s> 
+
+<s>[INST] 
+user msg [/INST]
 ```
 - 하지만 llama-2-7b-chat-hf 사용 시 llm이 요구한 대로 동작하지 않는 경우가 빈번하게 발생함. 
-- 좀 더 좋은 모델로 테스트를 하면 성능이 개선될 것으로 추정정
+- 좀 더 좋은 모델로 테스트를 하면 성능이 개선될 것으로 추정됨.
 
 #### KG
 
@@ -53,13 +64,26 @@ def inference(self, question: str, topicEntities: list[tuple[str, str]], maxDept
 
 ## 2. Evaluation
 
+- 다음의 명령어로 evaluate.py를 돌릴 수 있다.
+```shell
+# llama-2-7b로 simpleQA 돌리기 
+nohup python evaluate.py --dataset 0 > dataset_0.txt 2>&1 &
+# llama-2-7b로 CWQ 돌리기 
+nohup python evaluate.py --dataset 1 > dataset_1.txt 2>&1 &
+# llama-2-7b로 WebQSP 돌리기(LLM만)
+nohup python evaluate.py --dataset 2 --llm > dataset_2.txt 2>&1 &
+# llama-2-70b로 GrailQA 돌리기 
+nohup python evaluate.py --dataset 3 --model 1 > dataset_3.txt 2>&1 &
+```
+
 - ToG의 답변에 정답 텍스트가 들어가 있으면 맞다고 평가하였다.
+- Freebase만을 사용했기 때문에 mid가 있는 데이터셋들만 사용하였다. 
 
 | LLM | dataset | hit ratio |
 |-----|---------|-----------|
 | llama-2-7b-chat-hf | SimpleQA | 51.0% |
-| llama-2-7b-chat-hf | CWQ | 27% |
-| llama-2-7b-chat-hf | WebQSP | 53.5% |
+| llama-2-7b-chat-hf | CWQ | 29.3% |
+| llama-2-7b-chat-hf | WebQSP | 51.5% |
 | llama-2-7b-chat-hf | GrailQA | 57.0% |
 | llama-2-7b-chat-hf | WebQuestions | 42.3% |
 

@@ -1,5 +1,4 @@
 import re
-import json
 
 class Parser:
     def makeClean(self, text: str) -> list[str]:
@@ -33,23 +32,18 @@ class Parser:
         return coreInfos[:retrieveNum]
 
     
-    def entityPrune(self, answer: str, entityNames, retrieveNum=3) -> list[tuple[str, float]]:
-        jsonTexts = re.findall(r'\{.*?\}', answer, re.DOTALL)
+    def entityPrune(self, answer: str, entityNames) -> list[tuple[str, float]]:
+        coreTexts = re.findall(r'\{(.*?)\}', answer)
         coreInfos = []
-        for jsonText in jsonTexts:
+        for i in range(min(len(coreTexts), len(entityNames))):
             try:
-                jsonDict = json.loads(jsonText)
-                score = float(jsonDict['score'])
+                score = float(coreTexts[i])
             except:
-                print("json error")
                 score = 0.0
-            if jsonDict['entity'] not in entityNames:
-                continue
-            
-            coreInfos.append((jsonDict['entity'], score))
-
+            coreInfos.append((entityNames[i], score))
+        
         if coreInfos == []:
             coreInfos = [('Unknown-Entity', 0.0)]
-        return coreInfos[:retrieveNum]
+        return coreInfos
     
 parser = Parser()

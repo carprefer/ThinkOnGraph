@@ -60,7 +60,6 @@ class Llm:
                 continue
             prompt = promptMaker.entityPrune(question, relations[i], entityNameCandidates)
             answer = self.llama.answer(prompt, 0.4)
-            print("//////////////////////////////")
             print(prompt)
             print(answer)
             
