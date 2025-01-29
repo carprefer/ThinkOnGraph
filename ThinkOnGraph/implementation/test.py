@@ -15,7 +15,7 @@ def pathsTest():
     # after entity exploration
     top3IdEntities1 = [[('m2', 'sunho'), ('m3', 'han_gang')], [], [('m4', 'asia')]]
     paths.appendEntities(top3IdEntities1)
-    assert(paths.getEntities() == ['sunho', 'han_gang', 'asia'])
+    assert(paths.getEntityNames() == ['sunho', 'han_gang', 'asia'])
     # after relation exploration
     top3Relations2 = [[], ['wrote', 'age'], ['contain']]
     paths.appendRelations(top3Relations2)
@@ -23,10 +23,11 @@ def pathsTest():
     # after entity exploration
     top3IdEntities2 = [[('m4', 'vegetarian'), ('m5', 'human_acts')], [], [('m6', 'south_korea')]]
     paths.appendEntities(top3IdEntities2)
-    assert(paths.getEntities() == ['vegetarian', 'human_acts', 'south_korea'])
+    assert(paths.getEntityNames() == ['vegetarian', 'human_acts', 'south_korea'])
 
     print("<<<<< final paths >>>>>")
     paths.print()
+    print('\n'.join(', '.join(triple) for triple in paths.getTriples()))
 
 def searcherTest():
     print("<<<<< searcherTest start >>>>>")

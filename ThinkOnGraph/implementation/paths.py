@@ -1,14 +1,19 @@
 class Paths:
-    def __init__(self, topicIdEntities: list[tuple[str, str]], width = 3, maxDepth = 3):
-        assert len(topicIdEntities) <= width
+    def __init__(self, topicEntities: list[tuple[str, str]], width = 3, maxDepth = 3):
+        assert len(topicEntities) <= width
 
         self.width = width
         self.maxDepth = maxDepth
         # list of path
-        # each path: (id, entity) - relation - (id, entity) - relation ...
-        self.paths: list[list[tuple[str, str], str]] = [[topicIdEntity] for topicIdEntity in topicIdEntities]
+        # each path: (entityId, entityName) - relation - (entityId, entityName) - relation ...
+        self.paths: list[list[tuple[str, str], str]] = [[topicEntity] for topicEntity in topicEntities]
 
-    def getEntities(self) -> list[str]:
+    def getEntities(self) -> list[tuple[str, str]]:
+        assert len(self.paths) > 0 and len(self.paths) <= self.width
+
+        return [path[-1] if len(path) % 2 == 1 else path[-2] for path in self.paths]
+
+    def getEntityNames(self) -> list[str]:
         assert len(self.paths) > 0 and len(self.paths) <= self.width
 
         return [path[-1][1] if len(path) % 2 == 1 else path[-2][1] for path in self.paths]
@@ -20,29 +25,24 @@ class Paths:
         assert len(self.paths) > 0 and len(self.paths) <= self.width
         assert all(len(path) > 1 for path in self.paths)
 
-        return [path[-1] for path in self.paths]
+        return [path[-1] if len(path) % 2 == 0 else path[-2] for path in self.paths]
 
-    def getTriplePaths(self) -> list[list[tuple[str, str, str]]]:
+    def getTriples(self) -> list[tuple[str, str, str]]:
         assert len(self.paths) > 0 and len(self.paths) <= self.width
         assert all(len(path) % 2 == 1 and len(path) >= 3 for path in self.paths)
-
-        def getTriplePath(path: list[str]) -> list[tuple]:
-            assert len(path) % 2 == 1 and len(path) >= 3
-            assert len(path) <= self.maxDepth * 2 + 1
-            return [(path[i][1], path[i+1], path[i+2][1]) for i in range(0, len(path) - 2, 2)]
-        
-        return [getTriplePath(path) for path in self.paths]
-
+        triples = [(path[i][1].replace('Unknown-Entity',''), path[i+1], path[i+2][1].replace('Unknown-Entity','')) for path in self.paths for i in range(0, len(path) - 2, 2)]
+        return list(set(triples))
+    
     # newEntityLists example: [[apple, banana], [], [pear]]
-    def appendEntities(self, newIdEntityLists: list[list[tuple[str, str]]]) -> None:
-        assert len(newIdEntityLists) == len(self.paths)
+    def appendEntities(self, newEntityLists: list[list[tuple[str, str]]]) -> None:
+        assert len(newEntityLists) == len(self.paths)
         assert len(self.paths) > 0 and len(self.paths) <= self.width
         assert all(len(path) % 2 == 0 for path in self.paths)
-        #assert sum([len(l) for l in newIdEntityLists]) == self.width
+        assert sum([len(l) for l in newEntityLists]) <= self.width
 
         newPaths = []
         for i in range(len(self.paths)):
-            newPaths += [self.paths[i] + [idEntity] for idEntity in newIdEntityLists[i]]
+            newPaths += [self.paths[i] + [entity] for entity in newEntityLists[i]]
 
         self.paths = newPaths
 
@@ -50,7 +50,7 @@ class Paths:
         assert len(newRelationLists) == len(self.paths)
         assert len(self.paths) > 0 and len(self.paths) <= self.width
         assert all(len(path) % 2 == 1 for path in self.paths)
-        assert sum([len(l) for l in newRelationLists]) == self.width
+        assert sum([len(l) for l in newRelationLists]) <= self.width
 
         newPaths = []
         for i in range(len(self.paths)):

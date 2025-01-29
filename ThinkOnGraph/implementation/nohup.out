@@ -7427,3 +7427,12 @@ Traceback (most recent call last):
   File "/home/shcha/PaperImplementation/ThinkOnGraph/implementation/paths.py", line 53, in appendRelations
     assert sum([len(l) for l in newRelationLists]) == self.width
 AssertionError
+usage: evaluate.py [-h] [--v] [--dataset DATASET] [--model MODEL] [--llm]
+                   [--num NUM]
+evaluate.py: error: argument --dataset: expected one argument
+[]
+[]
+usage: evaluate.py [-h] [--v] [--dataset DATASET] [--model MODEL] [--llm]
+                   [--num NUM]
+evaluate.py: error: argument --dataset: expected one argument
+[]

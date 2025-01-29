@@ -58,8 +58,10 @@ elif datasetIdx == 3:
 elif datasetIdx == 4:
     dataset = webQuestionsLoader(datasetNum)
 
+datasetNum = len(dataset)
 correctCount = 0
 workingCount = 0
+llmOnlyCount = 0
 startTime = time.time()
 
 for i, (question, topicEntities, grounds) in enumerate(dataset):
@@ -73,12 +75,13 @@ for i, (question, topicEntities, grounds) in enumerate(dataset):
     correct = isExactAnswer(grounds, answer)
     correctCount += correct
     workingCount += working
+    llmOnlyCount += correct and not working
 
     print(answer)
     print("grounds:", grounds)
     paths.print()
     print("correct / working:", correct, "/", working)
-    print("correct / iteration / working:", correctCount, "/", i + 1, "/", workingCount)
+    print("correct / iteration / working / llm:", correctCount, "/", i + 1, "/", workingCount, "/", llmOnlyCount)
     print("avg time:", (time.time() - startTime) / (i+1))
 
 print("====================================================================================")
@@ -88,5 +91,5 @@ endTime = time.time()
 fileName = modelNames[modelIdx].replace('/', '_') + '_' + datasetNames[datasetIdx] + '.txt'
 with open(fileName, 'w') as file:
     file.write(f"result: {correctCount / datasetNum}\n")
-    file.write(f"correct / iteration / working: {correctCount} / {datasetNum} / {workingCount}\n")
+    file.write(f"correct / iteration / working / llm: {correctCount} / {datasetNum} / {workingCount} / {llmOnlyCount}\n")
     file.write(f"average time: {(endTime - startTime) / datasetNum} /question\n")

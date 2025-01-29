@@ -1,20 +1,6 @@
 import json
 import random
 
-def cwqLoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[str]]]:
-    with open("../data/cwq.json", 'r') as file:
-        dataset = json.load(file)
-    
-    testset = random.sample(dataset, num)
-    testPack = []
-    for data in testset:
-        question = data['machine_question']
-        topicIdEntities = list(data['topic_entity'].items())
-        grounds = [data['answer']]
-        testPack.append((question, topicIdEntities, grounds))
-
-    return testPack
-
 def simpleQALoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[str]]]:
     with open("../data/SimpleQA.json", 'r') as file:
         dataset = json.load(file)
@@ -23,11 +9,32 @@ def simpleQALoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[str]
     testPack = []
     for data in testset:
         question = data['question']
+        topicIdEntities = [(id, name.replace('"', "'").replace('\\','')) for id, name in data['topic_entity'].items()]
+        grounds = [data['answer']]
+        # some answers are represented by qid
+        if grounds[0].startswith('http'):
+            continue
+        testPack.append((question, topicIdEntities, grounds))
+
+    return testPack
+
+def cwqLoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[str]]]:
+    with open("../data/cwq.json", 'r') as file:
+        dataset = json.load(file)
+    
+    testset = random.sample(dataset, num)
+    testPack = []
+    for data in testset:
+        question = data['question']
         topicIdEntities = list(data['topic_entity'].items())
+        # there could be some questions with no topics
+        if topicIdEntities == []:
+            topicIdEntities = [('UnknownMID', 'Unknown-Entity')]
         grounds = [data['answer']]
         testPack.append((question, topicIdEntities, grounds))
 
     return testPack
+
 
 def webQSPLoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[str]]]:
     with open("../data/WebQSP.json", 'r') as file:
@@ -38,9 +45,11 @@ def webQSPLoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[str]]]
     for data in testset:
         question = data['ProcessedQuestion']
         topicIdEntities = list(data['topic_entity'].items())
-        grounds = [a['EntityName'] for p in data['Parses'] for a in p['Answers']]
-        if all(g == None for g in grounds):
-            grounds = ['Unknown-Entity']
+        grounds = [a['EntityName'] if a['AnswerType'] == 'Entity' else a['AnswerArgument'] for p in data['Parses'] for a in p['Answers']]
+        grounds = [g.replace('"', "'") for g in filter(lambda x: x.replace(' ','') != '', grounds)]
+        # some questions have no answer
+        if grounds == []:
+            continue
         testPack.append((question, topicIdEntities, grounds))
 
     return testPack
@@ -53,8 +62,12 @@ def grailQALoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[str]]
     testPack = []
     for data in testset:
         question = data['question']
-        topicIdEntities = list(data['topic_entity'].items())
-        grounds = [x['entity_name'] if x['answer_type'] == 'Entity' else x['answer_argument'] for x in data['answer']]
+        topicIdEntities = [(id, name.replace('"', "'")) for (id, name) in data['topic_entity'].items()]
+        # there could be some questions with no topics
+        if topicIdEntities == []:
+            topicIdEntities = [('UnknownMID', 'Unknown-Entity')]
+        grounds = [g['entity_name'] if g['answer_type'] == 'Entity' else g['answer_argument'] for g in data['answer']]
+        grounds = [g.replace('"', "'") for g in grounds]
         testPack.append((question, topicIdEntities, grounds))
 
     return testPack
@@ -67,8 +80,9 @@ def webQuestionsLoader(num: int) -> list[tuple[str, list[tuple[str, str]], list[
     testPack = []
     for data in testset:
         question = data['question']
-        topicIdEntities = list(data['topic_entity'].items())
-        grounds = filter(lambda x: x.replace(' ','') != '', data['answers'])
+        # id could be 'UnknownMID'
+        topicIdEntities = [(id, name.replace('"', "'")) for (id, name) in data['topic_entity'].items()]
+        grounds = [g.replace('"', "'").replace('\\','') for g in filter(lambda x: x.replace(' ','') != '', data['answers'])]
         testPack.append((question, topicIdEntities, grounds))
 
     return testPack

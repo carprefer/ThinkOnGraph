@@ -1,93 +1,73 @@
-import json
 from SPARQLWrapper import SPARQLWrapper, JSON
 import random
 from paths import Paths
 from maker import queryMaker
 
-SPARQLPATH = "http://localhost:8890/sparql"
 MAXCANDIDATES = 20
 
 # example: [result['relation']['value'] for result in getSparqlResults(query)]
-def getSparqlResults(query):
-    sparql = SPARQLWrapper(SPARQLPATH)
+def getSparqlResults(query, name):
+    sparql = SPARQLWrapper("http://localhost:8890/sparql")
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
     jsonResults = sparql.query().convert()
-    return jsonResults['results']['bindings']
+    return [r[name]['value'].replace('http://rdf.freebase.com/ns/', '') for r in jsonResults['results']['bindings']]
 
 class Searcher:
     def relationSearch(self, paths: Paths) -> list[list[str]]:
-        entityIds = paths.getEntityIds()
-        relationLists = [[] for _ in entityIds]
-        for i in range(len(entityIds)):
-            relationsF = [result['relation']['value'].replace('http://rdf.freebase.com/ns/', '') 
-                          for result in getSparqlResults(queryMaker.relationSearchF(entityIds[i]))]
-            relationsB = [result['relation']['value'].replace('http://rdf.freebase.com/ns/', '') 
-                          for result in getSparqlResults(queryMaker.relationSearchB(entityIds[i]))]
-            relationList = list(set(relationsF + relationsB))
+        entities = paths.getEntities()
+        relationLists = []
+        for entityId, entityName in entities:
+            relationsF = getSparqlResults(queryMaker.relationSearchF(entityId), 'relation')
+            relationsB = getSparqlResults(queryMaker.relationSearchB(entityId, entityName), 'relation')
+            relationList = list(filter(lambda x: x != 'type.object.name' and 
+                                       x != 'type.object.type' and 
+                                       'http://www.w3.org/2002/07/' not in x, set(relationsF + relationsB)))
             if len(relationList) > MAXCANDIDATES:
                 relationList = random.sample(relationList, MAXCANDIDATES)
-            relationLists[i] = relationList
+            relationLists.append(relationList)
  
         return relationLists
 
     def entitySearch(self, paths: Paths) -> list[list[tuple[str, str]]]:
         entityIds = paths.getEntityIds()
+        entityNames = paths.getEntityNames()
         relations = paths.getRelations()
         assert len(entityIds) == len(relations)
  
-        idEntityLists = [[] for _ in entityIds]
+        entityLists = [[] for _ in entityIds]
         for i in range(len(entityIds)):
-            if entityIds[i] == 'Unknown-Id' or 'http://www.w3.org/2002/07/' in relations[i]:
-                idEntityLists[i] = [('Unknown-Id', 'Unknown-Entity')]
-                continue
-            
-
-            for result in getSparqlResults(queryMaker.entitySearchF(entityIds[i], relations[i])):
-                value = result['tailEntity']['value'].replace('http://rdf.freebase.com/ns/', '')
-                if (value[:2] == 'g.' or value[:2] == 'm.'):
-                    lavel = getSparqlResults(queryMaker.id2entity(value))
+            for entity in getSparqlResults(queryMaker.entitySearchF(entityIds[i], relations[i]), 'tailEntity') + getSparqlResults(queryMaker.entitySearchB(entityIds[i], entityNames[i], relations[i]), 'headEntity'):
+                if (entity[:2] == 'g.' or entity[:2] == 'm.'):
+                    id = entity
+                    lavel = getSparqlResults(queryMaker.id2name(id), 'entityName')
                     if len(lavel) > 0:
-                        id = value
-                        entity = lavel[0]['tailEntity']['value']
+                        name = lavel[0]
                     else:
-                        id = value
-                        entity = 'Unknown-Entity'
+                        name = 'Unknown-Entity'
                 else:
-                    id = 'Unknown-Id'
-                    entity = value
-
-                idEntityLists[i].append((id, entity))
-            
-            for result in getSparqlResults(queryMaker.entitySearchB(entityIds[i], relations[i])):
-                value = result['tailEntity']['value'].replace('http://rdf.freebase.com/ns/', '')
-                if (value[:2] == 'g.' or value[:2] == 'm.'):
-                    lavel = getSparqlResults(queryMaker.id2entity(value))
-                    if len(lavel) > 0:
-                        id = value
-                        entity = lavel[0]['tailEntity']['value']
+                    name = entity
+                    mid = getSparqlResults(queryMaker.name2id(name), 'entityId')
+                    if len(mid) > 0:
+                        id = mid[0]
                     else:
-                        id = value
-                        entity = 'Unknown-Entity'
-                else:
-                    id = 'Unknown-Entity'
-                    entity = value
+                        id = 'UnknownMID'
 
-                idEntityLists[i].append((id, entity))
+                entityLists[i].append((id, name))
 
-            if idEntityLists[i] == []:
-                idEntityLists[i] = [('Unknown-Id', 'Unknown-Entity')]
+            if entityLists[i] == []:
+                entityLists[i] = [('UnknownMID', 'Unknown-Entity')]
             
-            if len(idEntityLists[i]) > MAXCANDIDATES:
-                idEntityLists[i] = random.sample(idEntityLists[i], MAXCANDIDATES)
+            if len(entityLists[i]) > MAXCANDIDATES:
+                entityLists[i] = random.sample(entityLists[i], MAXCANDIDATES)
         
-        return idEntityLists
+        return entityLists
     
     def aliasSearch(self, entityName):
-        return list(map(lambda x: x['alias']['value'], getSparqlResults(queryMaker.findAlias(entityName)))) + [entityName]
+        return getSparqlResults(queryMaker.findAlias(entityName), 'alias') + [entityName]
 
 searcher = Searcher()
 #while(True):
 #   id = input("> ")
-print(getSparqlResults(queryMaker.entity2id("music.artist")))
-print(getSparqlResults(queryMaker.findAlias("Korea")))
+# [('m.075kfb', 'Tamera Mowry'), 'people.person.date_of_birth', ('UnknownMID', '1978-07-06')]
+print(getSparqlResults(queryMaker.id2name('m.0_hltvl'), 'entityName'))

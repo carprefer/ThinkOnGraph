@@ -4,6 +4,8 @@ from transformers import BitsAndBytesConfig
 from maker import promptMaker
 from parser import parser 
 from paths import Paths
+from utils import *
+import json
 
 assert torch.cuda.device_count() == 8
 assert torch.cuda.is_available()
@@ -18,7 +20,7 @@ class Llama:
             modelName, 
             token=True, 
             device_map='auto',
-            torch_dtype=torch.float16,
+            #torch_dtype=torch.float16,
             #quantization_config=quantization_config
         )
 
@@ -34,6 +36,7 @@ class Llama:
             temperature=temperature,
             top_k=50,
             )
+        
         outputs = generator([{"role": "user", "content": prompt},])
         return outputs[0]['generated_text'][1]['content']
 
@@ -42,91 +45,84 @@ class Llm:
         self.llama = Llama(modelName)
 
     # entity could be different after prune
-    def entityPrune(self, question: str, paths: Paths, idEntityCandidates: list[list[tuple[str, str]]]) -> list[list[tuple[str, str]]]:
+    def entityPrune(self, question: str, paths: Paths, entityCandidates: list[list[tuple[str, str]]]) -> list[list[tuple[str, str]]]:
         relations: list[str] = paths.getRelations()
-        width = paths.width
-        id2entityDict = {}
-        for idEntityCandidate in idEntityCandidates:
-            id2entityDict.update(dict(idEntityCandidate))
-
-        entity2idDict = {value: key for key, value in id2entityDict.items()}
+        entity2idDict = reverseDict(dict(flatten(entityCandidates)))
 
         assert len(question) >= 5
-        assert len(relations) == len(idEntityCandidates)
-        #assert len(relations) <= sum([len(entities) for entities in idEntityCandidates])
+        assert len(relations) == len(entityCandidates)
 
-        entityCandidatesWithScore: list[tuple] = []
+        entityNameCandidatesWithScore: list[tuple[str, float, int]] = []
         for i in range(len(relations)):
-            entityCandidates = list(map(lambda x: x[1], idEntityCandidates[i]))
-            if all(entityCandidate == 'Unknown-Entity' for entityCandidate in entityCandidates):
-                entityCandidatesWithScore.append(('Unknown-Entity', 0.0, i))
+            entityNameCandidates = [name for (id, name) in entityCandidates[i]]
+            if all(en == 'Unknown-Entity' for en in entityNameCandidates):
+                entityNameCandidatesWithScore.append(('Unknown-Entity', 0.0, i))
                 continue
-            prompt = promptMaker.entityPrune(question, relations[i], entityCandidates, 3)
+            prompt = promptMaker.entityPrune(question, relations[i], entityNameCandidates)
             answer = self.llama.answer(prompt, 0.4)
             print("//////////////////////////////")
             print(prompt)
             print(answer)
+            
             # TODO adjust parsing methods
-            entityCandidatesWithScore += parser.afterEntityPrune(answer, entityCandidates, i, 3)
+            entityNameCandidatesWithScore += [e + (i,) for e in parser.entityPrune(answer, entityNameCandidates)]
 
-        entitiesWithScore = sorted(entityCandidatesWithScore, key=lambda x: x[1], reverse=True)[:width]
-        idEntities = [[] for _ in relations]    # it's length can be different with 'width'
+        entitiesWithScore = sorted(entityNameCandidatesWithScore, key=lambda x: x[1], reverse=True)[:paths.width]
+        entities = [[] for _ in relations]    # it's length can be different with 'width'
         for (entity, score, index) in entitiesWithScore:
-            id = entity2idDict[entity] if entity in entity2idDict else 'Unknown-Id'
-            idEntities[index].append((id, entity))
+            id = entity2idDict[entity] if entity in entity2idDict else 'UnknownMID'
+            entities[index].append((id, entity))
 
-        return idEntities
+        return entities
     
     # make list of (relation, score, index) tuple for each entity
     # and select top N relations according to their scores
     # their location indicate their topic entity
     def relationPrune(self, question: str, paths: Paths, relationCandidates: list[list[str]]) -> list[list[str]]:
-        entities: list[str] = paths.getEntities()
-        width: int = paths.width
+        entityNames: list[str] = paths.getEntityNames()
         assert len(question) >= 5
-        assert len(entities) == len(relationCandidates)
-        #assert len(entities) <= sum([len(relations) for relations in relationCandidates])
+        assert len(entityNames) == len(relationCandidates)
 
-        relationCandidatesWithScore: list[tuple] = []
-        for i in range(len(entities)):
+        relationCandidatesWithScore: list[tuple[str, float, int]] = []
+        for i in range(len(entityNames)):
             # TODO adjust k(3)
-            prompt = promptMaker.relationPrune(question, entities[i], relationCandidates[i], 3)
+            prompt = promptMaker.relationPrune(question, entityNames[i], relationCandidates[i])
             answer = self.llama.answer(prompt, 0.4)
-            print("//////////////////////////////")
+            print(prompt)
             print(answer)
             # TODO adjust parsing methods
-            relationCandidatesWithScore += parser.afterRelationPrune(answer, i)
+            relationCandidatesWithScore += [r + (i,) for r in parser.relationPrune(answer, relationCandidates[i])]
 
-        relationsWithScore = sorted(relationCandidatesWithScore, key=lambda x: x[1], reverse=True)[:width]
-        relations = [[] for _ in entities]    # it's length can be different with 'width'
+        relationsWithScore = sorted(relationCandidatesWithScore, key=lambda x: x[1], reverse=True)[:paths.width]
+        relations = [[] for _ in entityNames]    # it's length can be different with 'width'
         for (relation, score, index) in relationsWithScore:
             relations[index].append(relation)
 
         return relations
     
     def isEnoughToAnswer(self, question: str, paths: Paths) -> bool:
-        triplePaths: list[list[tuple[str, str, str]]] = paths.getTriplePaths()
+        triples: list[tuple[str, str, str]] = paths.getTriples()
         assert len(question) >= 5
-        assert all(len(triple) == 3 for path in triplePaths for triple in path)
+        assert all(len(triple) == 3 for triple in triples)
 
-        prompt = promptMaker.reasoning(question, triplePaths)
+        prompt = promptMaker.reasoning(question, triples)
         answer = self.llama.answer(prompt, 0.01)
         assert 'Yes' in answer or 'No' in answer
-
+        print(answer)
         return 'Yes' in answer
 
     def generateAnswer(self, question: str, paths: Paths, usePaths: bool) -> str:
-        triplePaths: list[list[tuple[str, str, str]]] = paths.getTriplePaths()
+        triples: list[tuple[str, str, str]] = paths.getTriples()
         assert len(question) > 5
-        assert all(len(triple) == 3 for path in triplePaths for triple in path)
+        assert all(len(triple) == 3 for triple in triples)
         if usePaths == False:
             prompt = question
         else:
-            prompt = promptMaker.generate(question, triplePaths)
+            prompt = promptMaker.generate(question, triples)
         return self.llama.answer(prompt, 0.01)
     
 #llm = Llama('meta-llama/Llama-2-7b-chat-hf')
 
-#inputText = "hello what your name?"
+#inputText = "what is the name of the the team won the 2009 AFC Championship Game championship head coach"
 #answer = llm.answer(inputText, 0.4)
 #print(answer)
