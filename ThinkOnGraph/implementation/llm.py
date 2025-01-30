@@ -20,7 +20,7 @@ class Llama:
             modelName, 
             token=True, 
             device_map='auto',
-            #torch_dtype=torch.float16,
+            torch_dtype=torch.float16,
             #quantization_config=quantization_config
         )
 
@@ -106,7 +106,6 @@ class Llm:
 
         prompt = promptMaker.reasoning(question, triples)
         answer = self.llama.answer(prompt, 0.01)
-        assert 'Yes' in answer or 'No' in answer
         print(answer)
         return 'Yes' in answer
 

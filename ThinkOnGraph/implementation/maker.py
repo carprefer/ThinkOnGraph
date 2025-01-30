@@ -81,6 +81,7 @@ Please retrieve {retrieveNum} relations (separated by semicolon) that contribute
 Q: where did Ralph W. Aigler die
 Topic Entity: Tucson
 Relations: people.deceased_person.place_of_death; type.object.type; common.topic.alias; common.topic.article; people.person.education; common.topic.description; people.person.nationality; common.topic.image; business.employment_tenure.person; type.object.name; education.education.student; people.person.gender; people.person.date_of_birth; people.profession.people_with_this_profession; common.image.appears_in_topic_gallery; common.topic.notable_types; people.deceased_person.date_of_death; common.topic.notable_for; people.person.employment_history; kg.object_profile.prominent_type
+[/INST]
 A:
 1. {{people.deceased_person.place_of_death <Score> 0.9}} This relation is highly relevant as it directly relates to the location where Ralph W. Aigler passed away.
 2. {{people.person.date_of_death <Score> 0.6}} This relation is also relevant as it provides the exact date when Ralph W. Aigler died, which can help narrow down the search for the place of death.
@@ -138,14 +139,13 @@ You are an AI assistant that helps people find information.
 
 Output answer in {{}} using the following format: {{Yes or No}}
 <</SYS>>
-
-Given a question and the associated retrieved knowledge graph triplets (entity, relation, entity), you are asked to answer whether it's sufficient for you to answer the question with these triplets and your knowledge (Yes or No).
-Q: The artist nominated for The Long Winter lived where?
-Knowledge Triplets: The Long Winter, book.written_work.author, Laura Ingalls Wilder
-Laura Ingalls Wilder, people.person.places_lived, Unknown-Entity
-Unknown-Entity, people.place_lived.location, De Smet
+Given a question and the associated retrieved knowledge graph triples (entity, relation, entity), you are asked to answer whether it's sufficient for you to answer the question with these triples and your knowledge (Yes or No).
+Q: Who is the coach of the team owned by Steve Bisciotti?
+Knowledge Triplets: Steve Bisciotti, sports.professional_sports_team.owner_s, Baltimore Ravens
+Steve Bisciotti, sports.sports_team_owner.teams_owned, Baltimore Ravens
+Steve Bisciotti, organization.organization_founder.organizations_founded, Allegis Group
 [/INST]
-A: {{Yes}}. Based on the given knowledge triplets, the author of The Long Winter, Laura Ingalls Wilder, lived in De Smet. Therefore, the answer to the question is {{De Smet}}.
+A: {{No}}. Based on the given knowledge triplets, the coach of the team owned by Steve Bisciotti is not explicitly mentioned. However, it can be inferred that the team owned by Steve Bisciotti is the Baltimore Ravens, a professional sports team. Therefore, additional knowledge about the current coach of the Baltimore Ravens can be used to answer the question.
 </s>
 
 <s>[INST]
@@ -175,6 +175,7 @@ A: Based on the given knowledge triplets, the author of The Long Winter, Laura I
 
 <s>[INST]
 Given a question and the associated retrieved knowledge graph triplets (entity, relation, entity), you are asked to answer the question with these triplets and your knowledge.
+Organize the information that can be derived from knowledge triplets, and use it as a reference to answer questions.
 Output answer in {{}} using the following format: {{answer}}
 Q: {question}
 Knowledge triples: {'\n'.join(', '.join(triple) for triple in triples)}
@@ -182,3 +183,19 @@ Knowledge triples: {'\n'.join(', '.join(triple) for triple in triples)}
     
 queryMaker = QueryMaker()
 promptMaker = PromptMaker()
+"""
+Output answer in {{}} using the following format: {{Yes or No}}
+<</SYS>>
+
+Given a question and the associated retrieved knowledge graph triplets (entity, relation, entity), you are asked to answer whether it's sufficient for you to answer the question with these triplets and your knowledge (Yes or No).
+Q: The artist nominated for The Long Winter lived where?
+Knowledge Triplets: The Long Winter, book.written_work.author, Laura Ingalls Wilder
+Laura Ingalls Wilder, people.person.places_lived, Unknown-Entity
+Unknown-Entity, people.place_lived.location, De Smet
+[/INST]
+A: {{Yes}}. Based on the given knowledge triplets, the author of The Long Winter, Laura Ingalls Wilder, lived in De Smet. Therefore, the answer to the question is {{De Smet}}.
+</s>
+
+<s>[INST]
+"""
+#{'\n'.join(', '.join(triple) for triple in triples)}

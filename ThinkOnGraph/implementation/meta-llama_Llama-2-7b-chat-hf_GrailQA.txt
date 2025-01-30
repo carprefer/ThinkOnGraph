@@ -1,3 +1,3 @@
-result: 0.44
-correct / iteration / working / llm: 44 / 100 / 0 / 44
-average time: 37.473965690135955 /question
+result: 0.47
+correct / iteration / working / llm: 47 / 100 / 79 / 7
+average time: 195.7864032840729 /question

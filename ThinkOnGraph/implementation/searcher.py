@@ -53,7 +53,7 @@ class Searcher:
                     else:
                         id = 'UnknownMID'
 
-                entityLists[i].append((id, name))
+                entityLists[i].append((id, name.replace('"',"'")))
 
             if entityLists[i] == []:
                 entityLists[i] = [('UnknownMID', 'Unknown-Entity')]
